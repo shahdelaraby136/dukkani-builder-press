@@ -264,6 +264,24 @@ class BuilderPage(WebsiteGenerator):
 
 	@frappe.whitelist()
 	def publish(self):
+		# DUKKANI_SHOP_PUBLISH
+		theme_routes = {
+			"دكاني بوتيك": "themes/boutique",
+			"دكاني مينيمال": "themes/minimal",
+			"دكاني دافئ": "themes/warm",
+		}
+		is_dukkani_theme = self.page_title in theme_routes or self.route == "shop"
+		if is_dukkani_theme:
+			for inactive in frappe.get_all(
+				"Builder Page",
+				filters={"name": ["!=", self.name], "page_title": ["in", list(theme_routes)]},
+				fields=["name", "page_title"],
+			):
+				frappe.db.set_value("Builder Page", inactive.name, {
+					"route": theme_routes[inactive.page_title], "published": 0,
+				})
+			self.route = "shop"
+
 		self.published = 1
 		self.published_at = now()
 		if self.draft_blocks:
