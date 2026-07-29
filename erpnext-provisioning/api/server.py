@@ -38,6 +38,7 @@ CUSTOMER_LOGIN_HTML = API_DIR / "customer-login.html"
 CUSTOMER_SIGNUP_HTML = API_DIR / "customer-signup.html"
 CUSTOMER_ACCOUNT_HTML = API_DIR / "customer-account.html"
 CUSTOMER_ORDERS_HTML = API_DIR / "customer-orders.html"
+WEB_LOGIN_HTML = API_DIR / "web-login.html"
 LANDING_DIR = API_DIR / "landing"
 LANDING_HTML = LANDING_DIR / "index.html"
 LANDING_ASSETS = LANDING_DIR / "images"
@@ -107,10 +108,25 @@ class Handler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def _send_unified_merchant_login(self):
-        """Serve Frappe's native login UI with tenant-aware authentication."""
+        """Serve Dukkani's branded login UI with tenant-aware authentication."""
         query = parse_qs(urlparse(self.path).query)
         email = (query.get("email") or [""])[0].strip()
         error = (query.get("error") or [""])[0].strip()
+        try:
+            html = WEB_LOGIN_HTML.read_text(encoding="utf-8")
+        except OSError:
+            return self._send(500, {"detail": "تعذر تحميل صفحة الدخول"})
+        html = html.replace("__PRESET_EMAIL_JSON__", json.dumps(email))
+        html = html.replace("__INITIAL_ERROR_JSON__", json.dumps(error))
+        body = html.encode("utf-8")
+        self.send_response(200)
+        self.send_header("Content-Type", "text/html; charset=utf-8")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("Content-Length", str(len(body)))
+        self.end_headers()
+        self.wfile.write(body)
+        return
+
         try:
             request = Request(
                 "http://127.0.0.1:8090/login?redirect-to=%2Fdesk",
