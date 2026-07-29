@@ -672,6 +672,14 @@ def _deploy_pages():
     print("[deploy] اتنشرت الصفحات: " + ", ".join(done))
 
 
+class DukkaniHTTPServer(ThreadingHTTPServer):
+    """Keep the public gateway responsive while provisioning jobs are running."""
+
+    request_queue_size = 128
+    daemon_threads = True
+    allow_reuse_address = True
+
+
 if __name__ == "__main__":
     print(f"==> Dukkani Provisioning API (stdlib) على http://0.0.0.0:{PORT}")
     print(f"==> مزامنة تلقائية للأدمن كل {SYNC_EVERY} ثانية")
@@ -680,4 +688,4 @@ if __name__ == "__main__":
     if resumed:
         print(f"[provisioning] تم استكمال {resumed} متجر بعد إعادة التشغيل")
     threading.Thread(target=_auto_sync_loop, daemon=True).start()
-    ThreadingHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
+    DukkaniHTTPServer(("0.0.0.0", PORT), Handler).serve_forever()
