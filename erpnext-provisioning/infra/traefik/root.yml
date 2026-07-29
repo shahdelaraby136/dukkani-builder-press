@@ -1,0 +1,28 @@
+http:
+  routers:
+    dukkani-api:
+      rule: "(Host(`dukani.ai`) || Host(`www.dukani.ai`)) && (Path(`/`) || Path(`/login`) || Path(`/signup`) || Path(`/signup.html`) || Path(`/register`) || Path(`/register.html`) || Path(`/merchant-access`) || Path(`/merchant-login`) || Path(`/me`) || Path(`/onboarding`) || Path(`/onboarding.html`) || Path(`/setup`) || Path(`/health`) || Path(`/resolve`) || PathPrefix(`/auth/`) || PathPrefix(`/landing-assets/`) || PathPrefix(`/tenants`) || PathPrefix(`/shop/reverse-geocode`) || PathPrefix(`/shop/order`) || PathPrefix(`/shop/review`) || PathPrefix(`/shop/products`) || PathPrefix(`/shop/customer-`) || Path(`/shop/track-order`))"
+      entryPoints: [websecure]
+      priority: 100
+      service: dukkani-api
+      tls:
+        certResolver: letsencrypt
+    dukkani-web:
+      rule: "Host(`dukani.ai`) || Host(`www.dukani.ai`)"
+      entryPoints: [websecure]
+      service: dukkani-web
+      tls:
+        certResolver: letsencrypt
+  services:
+    dukkani-api:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:9000"
+    dukkani-web:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:8090"
+    dukkani-press-web:
+      loadBalancer:
+        servers:
+          - url: "http://127.0.0.1:18080"

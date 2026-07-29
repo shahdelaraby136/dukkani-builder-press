@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>دكاني — ابني متجرك. امتلك علامتك. وانطلق بلا حدود.</title>
+    <meta name="description" content="دكاني يمنحك كل الأدوات لإطلاق وإدارة وتنمية متجرك الإلكتروني. منصة متكاملة للتجار السعوديين متوافقة مع ZATCA.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['IBM Plex Sans Arabic', 'system-ui', 'sans-serif'],
+                        en: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    maxWidth: {
+                        'site': '1200px',
+                    },
+                    fontSize: {
+                        'h1': ['48px', { lineHeight: '1.15', fontWeight: '700' }],
+                        'h2': ['36px', { lineHeight: '1.2', fontWeight: '700' }],
+                        'h3': ['28px', { lineHeight: '1.3', fontWeight: '700' }],
+                        'body': ['16px', { lineHeight: '1.6' }],
+                        'small': ['14px', { lineHeight: '1.5' }],
+                    },
+                    colors: {
+                        dark: {
+                            DEFAULT: '#111111',
+                            50: '#1a1a1a',
+                            100: '#222222',
+                            200: '#2a2a2a',
+                        }
+                    },
+                    borderRadius: {
+                        'btn': '10px',
+                        'card': '16px',
+                    }
+                },
+            },
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+        [id] { scroll-margin-top: 80px; }
+        .card-hover { transition: transform 0.2s ease, box-shadow 0.2s ease; }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.06); }
+        .feature-card { transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+        .toggle-knob { transition: transform 0.2s ease; }
+        .faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease, padding 0.3s ease; }
+        .faq-answer.open { max-height: 200px; }
+        .faq-icon { transition: transform 0.2s ease; }
+        .faq-icon.open { transform: rotate(45deg); }
+
+        /* Language toggle */
+        .lang-en { display: none; }
+        html[lang="en"] .lang-ar { display: none; }
+        html[lang="en"] .lang-en { display: inline; }
+        html[lang="en"] .lang-en-block { display: block; }
+        html[lang="en"] .lang-ar-block { display: none; }
+        .lang-en-block { display: none; }
+        .lang-ar-block { display: block; }
+        html[lang="en"] body { font-family: 'Inter', system-ui, sans-serif; }
+
+        /* Navbar: transparent on hero (dark bg), solid white after scroll */
+        .nav-text { color: #fff; }
+        .nav-link { color: rgba(255,255,255,0.6); }
+        .nav-link:hover { color: #fff; }
+        .nav-logo-box { background: #000; }
+        .nav-logo-box svg { color: #fff; }
+        .nav-cta { background: #fff; color: #000; }
+        .nav-cta:hover { background: #e5e5e5; }
+
+        nav.scrolled { background: rgba(255,255,255,0.95) !important; border-color: #e5e5e5 !important; }
+        nav.scrolled .nav-text { color: #111; }
+        nav.scrolled .nav-link { color: #737373; }
+        nav.scrolled .nav-link:hover { color: #111; }
+        nav.scrolled .nav-logo-box { background: #000; }
+        nav.scrolled .nav-logo-box svg { color: #fff; }
+        nav.scrolled .nav-cta { background: #000; color: #fff; }
+        nav.scrolled .nav-cta:hover { background: #333; }
+
+        /* Lang switch button */
+        .lang-switch { cursor: pointer; transition: all 0.2s; }
+        .lang-switch:hover { opacity: 0.8; }
+
+        /* Scroll reveal */
+        .reveal {
+            opacity: 0;
+            transform: translateY(24px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .reveal.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .reveal-child {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .reveal-child.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Marquee animation */
+        @keyframes marquee {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+        .marquee-track {
+            display: flex;
+            animation: marquee 20s linear infinite;
+            width: max-content;
+        }
+        .marquee-track:hover { animation-play-state: paused; }
+        html[dir="ltr"] .marquee-track {
+            animation-direction: reverse;
+        }
+    </style>
+</head>
+
+<body class="font-sans bg-white text-neutral-800 antialiased">
+
+
+
+
+<nav id="navbar" class="fixed inset-x-0 top-0 z-50 backdrop-blur-md transition-colors duration-300 border-b border-transparent" style="background:transparent;">
+    <div class="max-w-site mx-auto px-6">
+        <div class="flex items-center justify-between h-16">
+
+            <a href="/" class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-black rounded-btn flex items-center justify-center nav-logo-box">
+                    <svg class="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="text-lg font-bold nav-text"><span class="lang-ar">دكاني</span><span class="lang-en">Dukkani</span></span>
+            </a>
+
+            <div class="hidden md:flex items-center gap-8">
+                <a href="#features" class="text-small nav-link transition-colors"><span class="lang-ar">المزايا</span><span class="lang-en">Features</span></a>
+                <a href="#how-it-works" class="text-small nav-link transition-colors"><span class="lang-ar">كيف يعمل</span><span class="lang-en">How It Works</span></a>
+                <a href="#pricing" class="text-small nav-link transition-colors"><span class="lang-ar">الأسعار</span><span class="lang-en">Pricing</span></a>
+                <a href="#faq" class="text-small nav-link transition-colors"><span class="lang-ar">الأسئلة الشائعة</span><span class="lang-en">FAQ</span></a>
+            </div>
+
+            <div class="flex items-center gap-3">
+
+                <button onclick="toggleLang()" class="lang-switch inline-flex items-center gap-1.5 h-8 px-3 text-xs font-semibold rounded-full border border-white/20 nav-link">
+                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418"/></svg>
+                    <span class="lang-ar">EN</span><span class="lang-en">AR</span>
+                </button>
+                                    <a href="/login" class="block text-small nav-link transition-colors"><span class="lang-ar">تسجيل الدخول</span><span class="lang-en">Login</span></a>
+                    <a href="/signup" class="inline-flex items-center h-10 px-6 text-small font-semibold text-white bg-black hover:bg-neutral-800 rounded-btn transition-colors nav-cta"><span class="lang-ar">ابدأ مجاناً</span><span class="lang-en">Start Free</span></a>
+                                <button onclick="document.getElementById('mob-menu').classList.toggle('hidden')" class="md:hidden p-2 nav-link">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="mob-menu" class="hidden md:hidden border-t border-neutral-100 bg-white px-6 py-4 space-y-2">
+        <a href="#features" class="block py-2 text-small text-neutral-600"><span class="lang-ar">المزايا</span><span class="lang-en">Features</span></a>
+        <a href="#how-it-works" class="block py-2 text-small text-neutral-600"><span class="lang-ar">كيف يعمل</span><span class="lang-en">How It Works</span></a>
+        <a href="#pricing" class="block py-2 text-small text-neutral-600"><span class="lang-ar">الأسعار</span><span class="lang-en">Pricing</span></a>
+        <a href="#faq" class="block py-2 text-small text-neutral-600"><span class="lang-ar">الأسئلة الشائعة</span><span class="lang-en">FAQ</span></a>
+    </div>
+</nav>
+
+
+
+
+
+<section class="relative overflow-hidden" style="min-height:100vh;display:flex;flex-direction:column;">
+
+    <div class="absolute inset-0">
+        <img src="/landing-assets/hero-bg.png" alt="خلفية المتجر" class="w-full h-full object-cover" loading="eager">
+        <div class="absolute inset-0 bg-black/50"></div>
+    </div>
+
+    <div class="relative z-10 flex-1" style="display:flex;align-items:center;justify-content:center;">
+        <div class="w-full max-w-4xl mx-auto px-6 text-center" style="display:flex;flex-direction:column;align-items:center;gap:24px;">
+
+            <h1 class="text-3xl sm:text-4xl lg:text-5xl font-bold text-white" style="line-height:1.4">
+                <span class="lang-ar">ابني متجرك. امتلك علامتك.<br>وانطلق بلا حدود.</span>
+                <span class="lang-en">Build Your Store. Own Your Brand.<br>Grow Without Limits.</span>
+            </h1>
+
+            <p class="text-lg sm:text-xl text-white/80 max-w-2xl">
+                <span class="lang-ar">دكاني يمنحك كل الأدوات لإطلاق وإدارة وتنمية متجرك الإلكتروني.</span>
+                <span class="lang-en">Dukkani gives you all the tools to launch, manage, and grow your online store.</span>
+            </p>
+
+            <div class="flex flex-wrap items-center justify-center gap-4">
+                <a href="/signup" class="inline-flex items-center gap-2 h-14 px-8 text-base font-semibold text-white bg-black hover:bg-neutral-800 rounded-btn transition-colors">
+                    <span class="lang-ar">ابدأ الآن مجاناً</span><span class="lang-en">Start Free Now</span>
+                    <svg class="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                </a>
+                <a href="#features" class="inline-flex items-center gap-2 h-14 px-8 text-base font-semibold text-white border-2 border-white/30 hover:border-white/60 rounded-btn transition-colors">
+                    <span class="lang-ar">اكتشف المزايا</span><span class="lang-en">Explore Features</span>
+                    <svg class="w-5 h-5 rtl:rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/></svg>
+                </a>
+            </div>
+
+            <p class="text-sm text-white/60"><span class="lang-ar">المنصة التي يعتمد عليها التجار الطموحون.</span><span class="lang-en">The platform ambitious merchants rely on.</span></p>
+        </div>
+    </div>
+</section>
+
+<div class="bg-black text-white">
+    <div class="max-w-site mx-auto px-6 py-6">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            <div class="reveal-child">
+                <p class="text-2xl sm:text-3xl font-bold">5,000+</p>
+                <p class="text-xs text-neutral-400 mt-1"><span class="lang-ar">تاجر نشط</span><span class="lang-en">Active Merchants</span></p>
+            </div>
+            <div class="reveal-child">
+                <p class="text-2xl sm:text-3xl font-bold">$50M+</p>
+                <p class="text-xs text-neutral-400 mt-1"><span class="lang-ar">تم معالجتها</span><span class="lang-en">Processed</span></p>
+            </div>
+            <div class="reveal-child">
+                <p class="text-2xl sm:text-3xl font-bold">15+</p>
+                <p class="text-xs text-neutral-400 mt-1"><span class="lang-ar">دولة</span><span class="lang-en">Countries</span></p>
+            </div>
+            <div class="reveal-child">
+                <p class="text-2xl sm:text-3xl font-bold">99.9%</p>
+                <p class="text-xs text-neutral-400 mt-1"><span class="lang-ar">وقت التشغيل</span><span class="lang-en">Uptime</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<section class="py-14 bg-neutral-50 border-b border-neutral-100">
+    <div class="max-w-site mx-auto px-6">
+        <p class="text-center text-small text-neutral-400 mb-10"><span class="lang-ar">بوابات الدفع وشركات الشحن المتكاملة</span><span class="lang-en">Integrated Payment Gateways & Shipping Partners</span></p>
+        <div class="flex flex-wrap items-center justify-center gap-6">
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 100 40" fill="none"><rect width="100" height="40" rx="8" fill="#1D4F91"/><text x="50" y="26" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial">mada</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 100 40" fill="none"><rect width="100" height="40" rx="8" fill="#1A1F71"/><text x="50" y="26" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial">VISA</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 100 40" fill="none"><rect width="100" height="40" rx="8" fill="#EB001B"/><circle cx="40" cy="20" r="14" fill="#EB001B"/><circle cx="60" cy="20" r="14" fill="#F79E1B" opacity="0.8"/></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 110 40" fill="none"><rect width="110" height="40" rx="8" fill="#000"/><text x="20" y="27" fill="white" font-size="18" font-family="Arial">&#xF8FF;</text><text x="42" y="26" fill="white" font-size="15" font-weight="bold" font-family="Arial">Pay</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 100 40" fill="none"><rect width="100" height="40" rx="8" fill="#3FFFC3"/><text x="50" y="26" text-anchor="middle" fill="#292929" font-size="16" font-weight="bold" font-family="Arial">tabby</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 110 40" fill="none"><rect width="110" height="40" rx="8" fill="#F5D100"/><text x="55" y="26" text-anchor="middle" fill="#000" font-size="15" font-weight="bold" font-family="Arial">tamara</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 100 40" fill="none"><rect width="100" height="40" rx="8" fill="#E31937"/><text x="50" y="26" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">SMSA</text></svg>
+            <svg class="h-10 shrink-0 opacity-80 hover:opacity-100 transition-opacity" viewBox="0 0 110 40" fill="none"><rect width="110" height="40" rx="8" fill="#E35205"/><text x="55" y="26" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial">aramex</text></svg>
+    </div>
+</section>
+
+
+
+
+
+<section id="features" class="py-20 bg-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">ابدأ ببساطة</span><span class="lang-en">Start Simply</span></h2>
+            <p class="text-body text-neutral-500"><span class="lang-ar">كل ما تحتاجه لإطلاق متجرك في أقل من ساعة</span><span class="lang-en">Everything you need to launch your store in under an hour</span></p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">متجر إلكتروني متكامل</span><span class="lang-en">Complete Online Store</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">أنشئ متجرك بقالب جاهز، رابط مخصص، ونطاق خاص — بدون أي سطر كود.</span><span class="lang-en">Create your store with ready templates, custom link, and domain — no coding needed.</span></p>
+            </div>
+                        <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">فوترة ZATCA تلقائية</span><span class="lang-en">Automatic ZATCA Invoicing</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">فواتير إلكترونية بـ QR Code ورقم ضريبي وتوقيع رقمي — متوافقة مع المرحلة الثانية.</span><span class="lang-en">E-invoices with QR Code, tax number, and digital signature — Phase 2 compliant.</span></p>
+            </div>
+                        <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">مدفوعات متعددة</span><span class="lang-en">Multiple Payments</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">مدى، فيزا، Apple Pay، تقسيط مع تابي وتمارا، والدفع عند الاستلام — كلها مدمجة.</span><span class="lang-en">mada, Visa, Apple Pay, installments with Tabby &amp; Tamara, and COD — all built in.</span></p>
+            </div>
+                        <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">إدارة منتجات ذكية</span><span class="lang-en">Smart Product Management</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">متغيرات (ألوان، مقاسات)، باركود، تتبع مخزون، ومنتجات رقمية — كلها من مكان واحد.</span><span class="lang-en">Variants (colors, sizes), barcodes, inventory tracking, and digital products — all in one place.</span></p>
+            </div>
+                        <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0H21M3.375 14.25h3.417c.69 0 1.352.275 1.84.764L12 18.375m0 0l3.366-3.361a2.605 2.605 0 011.842-.764h3.417m-17.25 0V4.875c0-.621.504-1.125 1.125-1.125h3.026a2.999 2.999 0 012.284 1.053L12 7.125"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">شحن مدمج</span><span class="lang-en">Built-in Shipping</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">ربط مباشر مع SMSA و Aramex. تتبع الشحنات وإصدار بوالص الشحن تلقائياً.</span><span class="lang-en">Direct integration with SMSA &amp; Aramex. Auto-track shipments and generate waybills.</span></p>
+            </div>
+                        <div class="group reveal-child feature-card rounded-card bg-white border border-neutral-200 p-6 hover:bg-neutral-50 hover:border-neutral-300 hover:shadow-md cursor-default">
+                <div class="w-12 h-12 rounded-btn border border-neutral-200 group-hover:border-neutral-300 flex items-center justify-center mb-4" style="transition:border-color .2s ease">
+                    <svg class="w-6 h-6 text-neutral-700 group-hover:text-black" style="transition:color .2s ease" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>
+                </div>
+                <h3 class="text-body font-bold text-neutral-900 mb-2"><span class="lang-ar">فريق وصلاحيات</span><span class="lang-en">Team &amp; Permissions</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">أضف موظفين بـ 4 أدوار مختلفة و 38 صلاحية — تحكم كامل في من يشوف إيش.</span><span class="lang-en">Add staff with 4 roles and 38 permissions — full control over who sees what.</span></p>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section class="py-20 bg-dark text-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+                <h2 class="text-h2 mb-4 reveal"><span class="lang-ar">توسّع بقوة</span><span class="lang-en">Scale with Power</span></h2>
+                <p class="text-small text-neutral-400 mb-8"><span class="lang-ar">أدوات متقدمة تساعدك تنمّي مبيعاتك وتوصل لعملاء أكثر</span><span class="lang-en">Advanced tools to grow your sales and reach more customers</span></p>
+                <div class="space-y-6">
+                                                            <div class="flex gap-4 items-start reveal-child">
+                        <div class="w-10 h-10 rounded-btn bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-small font-bold mb-1"><span class="lang-ar">تحليلات وتقارير متقدمة</span><span class="lang-en">Advanced Analytics &amp; Reports</span></h4>
+                            <p class="text-xs text-neutral-400 leading-relaxed"><span class="lang-ar">إيرادات، طلبات، أفضل المنتجات، قيمة العميل — مع مقارنة بالفترات السابقة.</span><span class="lang-en">Revenue, orders, top products, customer value — with period comparisons.</span></p>
+                        </div>
+                    </div>
+                                        <div class="flex gap-4 items-start reveal-child">
+                        <div class="w-10 h-10 rounded-btn bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3zM6 6h.008v.008H6V6z"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-small font-bold mb-1"><span class="lang-ar">كوبونات وعروض ترويجية</span><span class="lang-en">Coupons &amp; Promotions</span></h4>
+                            <p class="text-xs text-neutral-400 leading-relaxed"><span class="lang-ar">خصم ثابت أو نسبي، حد أدنى للشراء، تاريخ انتهاء، وتطبيق على منتجات محددة.</span><span class="lang-en">Fixed or percentage discounts, minimum purchase, expiry dates, and product-specific rules.</span></p>
+                        </div>
+                    </div>
+                                        <div class="flex gap-4 items-start reveal-child">
+                        <div class="w-10 h-10 rounded-btn bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-small font-bold mb-1"><span class="lang-ar">تطبيق جوال لمتجرك</span><span class="lang-en">Mobile App for Your Store</span></h4>
+                            <p class="text-xs text-neutral-400 leading-relaxed"><span class="lang-ar">تطبيق iOS و Android جاهز بتقنية NativePHP — عملاءك يشترون من الجوال مباشرة.</span><span class="lang-en">Ready iOS &amp; Android app with NativePHP — your customers buy directly from mobile.</span></p>
+                        </div>
+                    </div>
+                                        <div class="flex gap-4 items-start reveal-child">
+                        <div class="w-10 h-10 rounded-btn bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-small font-bold mb-1"><span class="lang-ar">استرجاع واستبدال متقدم</span><span class="lang-en">Advanced Returns &amp; Exchanges</span></h4>
+                            <p class="text-xs text-neutral-400 leading-relaxed"><span class="lang-ar">إدارة طلبات الاسترجاع بأرقام تتبع، حالات متعددة، واسترداد المبالغ تلقائياً.</span><span class="lang-en">Manage return requests with tracking, multiple statuses, and auto-refunds.</span></p>
+                        </div>
+                    </div>
+                                        <div class="flex gap-4 items-start reveal-child">
+                        <div class="w-10 h-10 rounded-btn bg-white/10 flex items-center justify-center shrink-0">
+                            <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/></svg>
+                        </div>
+                        <div>
+                            <h4 class="text-small font-bold mb-1"><span class="lang-ar">إشعارات فورية</span><span class="lang-en">Instant Notifications</span></h4>
+                            <p class="text-xs text-neutral-400 leading-relaxed"><span class="lang-ar">تنبيهات طلب جديد، مخزون منخفض، عميل جديد — بالإيميل والإشعارات وFirebase.</span><span class="lang-en">New order, low stock, new customer alerts — via email, push notifications &amp; Firebase.</span></p>
+                        </div>
+                    </div>
+                                    </div>
+            </div>
+            <div class="reveal">
+                <div class="w-full aspect-[4/3] rounded-card overflow-hidden border border-white/10">
+                    <img src="https://plus.unsplash.com/premium_photo-1682129766583-27dc77d80420?w=800&q=80" alt="إدارة المتجر والشحن" class="w-full h-full object-cover" loading="lazy">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<section class="py-20 bg-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">مصمم للسوق السعودي</span><span class="lang-en">Built for the Saudi Market</span></h2>
+            <p class="text-body text-neutral-500"><span class="lang-ar">مش بس منصة تجارة — منصة تفهم السوق المحلي</span><span class="lang-en">Not just an e-commerce platform — one that understands the local market</span></p>
+        </div>
+        <div class="grid lg:grid-cols-2 gap-12 items-center">
+            <div class="order-2 lg:order-1 reveal">
+                <div class="w-full aspect-[4/3] rounded-card overflow-hidden border border-neutral-200">
+                    <img src="https://plus.unsplash.com/premium_photo-1661751019469-197c07545a6b?w=800&q=80" alt="الدفع الإلكتروني عبر الجوال" class="w-full h-full object-cover" loading="lazy">
+                </div>
+            </div>
+            <div class="order-1 lg:order-2 space-y-8">
+                                                <div class="flex gap-4 items-start reveal-child">
+                    <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-body font-bold text-neutral-900 mb-1"><span class="lang-ar">ZATCA المرحلة الثانية</span><span class="lang-en">ZATCA Phase 2</span></h4>
+                        <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">فوترة إلكترونية كاملة — QR Code، توقيع رقمي ECDSA، تقارير وربط مباشر مع هيئة الزكاة.</span><span class="lang-en">Full e-invoicing — QR Code, ECDSA digital signature, reports and direct ZATCA integration.</span></p>
+                    </div>
+                </div>
+                                <div class="flex gap-4 items-start reveal-child">
+                    <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-body font-bold text-neutral-900 mb-1"><span class="lang-ar">عملات متعددة</span><span class="lang-en">Multi-Currency</span></h4>
+                        <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">ريال سعودي، درهم إماراتي، جنيه مصري، دينار كويتي، وباقي العملات الخليجية.</span><span class="lang-en">SAR, AED, EGP, KWD, and all GCC currencies supported.</span></p>
+                    </div>
+                </div>
+                                <div class="flex gap-4 items-start reveal-child">
+                    <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 21l5.25-11.25L21 21m-9-3h7.5M3 5.621a48.474 48.474 0 016-.371m0 0c1.12 0 2.233.038 3.334.114M9 5.25V3m3.334 2.364C11.176 10.658 7.69 15.08 3 17.502m9.334-12.138c.896.061 1.785.147 2.666.257m-4.589 8.495a18.023 18.023 0 01-3.827-5.802"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-body font-bold text-neutral-900 mb-1"><span class="lang-ar">عربي أولاً مع دعم إنجليزي</span><span class="lang-en">Arabic-First with English Support</span></h4>
+                        <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">واجهة RTL كاملة، منتجات ثنائية اللغة، وتجربة عربية أصيلة لعملائك.</span><span class="lang-en">Full RTL interface, bilingual products, and an authentic Arabic experience for your customers.</span></p>
+                    </div>
+                </div>
+                                <div class="flex gap-4 items-start reveal-child">
+                    <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center shrink-0">
+                        <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M7.864 4.243A7.5 7.5 0 0119.5 10.5c0 2.92-.556 5.709-1.568 8.268M5.742 6.364A7.465 7.465 0 004.5 10.5a7.464 7.464 0 01-1.15 3.993m1.989 3.559A11.209 11.209 0 008.25 10.5a3.75 3.75 0 117.5 0c0 .527-.021 1.049-.064 1.565M12 10.5a14.94 14.94 0 01-3.6 9.75m6.633-4.596a18.666 18.666 0 01-2.485 5.33"/></svg>
+                    </div>
+                    <div>
+                        <h4 class="text-body font-bold text-neutral-900 mb-1"><span class="lang-ar">تسجيل دخول متعدد</span><span class="lang-en">Multiple Sign-in Methods</span></h4>
+                        <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">إيميل وكلمة مرور، تسجيل بـ Google، Apple Sign-In، ورمز OTP للجوال.</span><span class="lang-en">Email &amp; password, Google Sign-In, Apple Sign-In, and mobile OTP.</span></p>
+                    </div>
+                </div>
+                            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<section class="py-20 bg-neutral-50">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">لوحة تحكم قوية وسهلة</span><span class="lang-en">Powerful & Easy Dashboard</span></h2>
+            <p class="text-body text-neutral-500"><span class="lang-ar">كل شيء تحتاجه لإدارة متجرك من مكان واحد</span><span class="lang-en">Everything you need to manage your store from one place</span></p>
+        </div>
+        <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                                    <div class="bg-white rounded-card border border-neutral-200 p-6 reveal-child">
+                <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z"/></svg>
+                </div>
+                <h3 class="text-small font-bold text-neutral-900 mb-2"><span class="lang-ar">تحليلات لحظية</span><span class="lang-en">Real-time Analytics</span></h3>
+                <p class="text-xs text-neutral-500 leading-relaxed"><span class="lang-ar">إيرادات، طلبات، ومتوسط قيمة الطلب مع مقارنة بالفترات السابقة</span><span class="lang-en">Revenue, orders, and average order value with period comparisons</span></p>
+            </div>
+                        <div class="bg-white rounded-card border border-neutral-200 p-6 reveal-child">
+                <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/></svg>
+                </div>
+                <h3 class="text-small font-bold text-neutral-900 mb-2"><span class="lang-ar">إدارة الطلبات</span><span class="lang-en">Order Management</span></h3>
+                <p class="text-xs text-neutral-500 leading-relaxed"><span class="lang-ar">تتبع من الطلب للتوصيل — معالجة، تأكيد، شحن، تسليم، وإلغاء</span><span class="lang-en">Track from order to delivery — processing, confirmation, shipping, delivery, and cancellation</span></p>
+            </div>
+                        <div class="bg-white rounded-card border border-neutral-200 p-6 reveal-child">
+                <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z"/></svg>
+                </div>
+                <h3 class="text-small font-bold text-neutral-900 mb-2"><span class="lang-ar">الرصيد والتسويات</span><span class="lang-en">Balance &amp; Settlements</span></h3>
+                <p class="text-xs text-neutral-500 leading-relaxed"><span class="lang-ar">تتبع العمولات، المستحقات، والمدفوعات مع طلبات سحب مباشرة</span><span class="lang-en">Track commissions, dues, and payments with direct withdrawal requests</span></p>
+            </div>
+                        <div class="bg-white rounded-card border border-neutral-200 p-6 reveal-child">
+                <div class="w-12 h-12 rounded-btn bg-neutral-100 flex items-center justify-center mb-4">
+                    <svg class="w-6 h-6 text-neutral-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z"/></svg>
+                </div>
+                <h3 class="text-small font-bold text-neutral-900 mb-2"><span class="lang-ar">إعدادات كاملة</span><span class="lang-en">Full Settings</span></h3>
+                <p class="text-xs text-neutral-500 leading-relaxed"><span class="lang-ar">ضبط الدفع، الشحن، الضرائب، الفريق، والبراند من مكان واحد</span><span class="lang-en">Configure payments, shipping, taxes, team, and branding from one place</span></p>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="how-it-works" class="py-20 bg-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">ابدأ البيع في 3 خطوات</span><span class="lang-en">Start Selling in 3 Steps</span></h2>
+            <p class="text-body text-neutral-500"><span class="lang-ar">من التسجيل لأول طلب — في أقل من ساعة</span><span class="lang-en">From sign-up to first order — in under an hour</span></p>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 max-w-3xl mx-auto">
+                                    <div class="rounded-card bg-white border border-neutral-200 p-6 text-center reveal-child">
+                <div class="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-body font-bold">1</div>
+                <h3 class="text-body font-bold text-neutral-900 mb-3"><span class="lang-ar">سجّل وأنشئ متجرك</span><span class="lang-en">Sign Up &amp; Create Your Store</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">اختر &quot;إطلاق سريع&quot; أو &quot;إطلاق آمن&quot;. سمِّ متجرك، اختر التصنيف، وخصص الألوان والشعار.</span><span class="lang-en">Choose &quot;Quick Launch&quot; or &quot;Safe Launch&quot;. Name your store, pick a category, and customize colors &amp; logo.</span></p>
+            </div>
+                        <div class="rounded-card bg-white border border-neutral-200 p-6 text-center reveal-child">
+                <div class="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-body font-bold">2</div>
+                <h3 class="text-body font-bold text-neutral-900 mb-3"><span class="lang-ar">أضف منتجاتك والدفع</span><span class="lang-en">Add Products &amp; Payments</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">استخدم القوالب الجاهزة أو أضف منتجاتك يدوياً. فعّل بوابات الدفع وشركات الشحن.</span><span class="lang-en">Use ready templates or add products manually. Enable payment gateways and shipping providers.</span></p>
+            </div>
+                        <div class="rounded-card bg-white border border-neutral-200 p-6 text-center reveal-child">
+                <div class="w-12 h-12 rounded-full bg-black text-white flex items-center justify-center mx-auto mb-4 text-body font-bold">3</div>
+                <h3 class="text-body font-bold text-neutral-900 mb-3"><span class="lang-ar">شارك رابطك وابدأ البيع</span><span class="lang-en">Share Your Link &amp; Start Selling</span></h3>
+                <p class="text-small text-neutral-500 leading-relaxed"><span class="lang-ar">شارك رابط متجرك واستقبل الطلبات. الفواتير والشحن يشتغلون تلقائي.</span><span class="lang-en">Share your store link and receive orders. Invoicing and shipping work automatically.</span></p>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="testimonials" class="py-20 bg-neutral-50">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900"><span class="lang-ar">تجار حقيقيين. نتائج حقيقية.</span><span class="lang-en">Real Merchants. Real Results.</span></h2>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6">
+                                    <div class="card-hover rounded-card border border-neutral-200 bg-white p-6 reveal-child">
+                <div class="flex gap-1 mb-4">
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    </div>
+                <p class="text-small text-neutral-600 leading-relaxed mb-4">"<span class="lang-ar">أطلقت متجري يوم الجمعة وجاني أول 50 طلب قبل الإثنين. الفوترة الإلكترونية وفّرت عليّ 8,000 ريال سنوياً من المحاسب.</span><span class="lang-en">I launched my store on Friday and got my first 50 orders before Monday. E-invoicing saved me 8,000 SAR/year on accounting.</span>"</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center"><span class="text-xs font-bold text-neutral-500"><span class="lang-ar">أ</span><span class="lang-en">A</span></span></div>
+                    <div>
+                        <p class="text-small font-bold text-neutral-900"><span class="lang-ar">أحمد المنصور</span><span class="lang-en">Ahmed Al-Mansour</span></p>
+                        <p class="text-xs text-neutral-400"><span class="lang-ar">صاحب متجر أزياء</span><span class="lang-en">Fashion Store Owner</span></p>
+                    </div>
+                </div>
+            </div>
+                        <div class="card-hover rounded-card border border-neutral-200 bg-white p-6 reveal-child">
+                <div class="flex gap-1 mb-4">
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    </div>
+                <p class="text-small text-neutral-600 leading-relaxed mb-4">"<span class="lang-ar">المنصة سهلة جداً والدعم ممتاز. الفواتير متوافقة مع ZATCA تلقائي وما احتجت أي مطور. التقسيط مع تابي رفع مبيعاتي 35%.</span><span class="lang-en">The platform is very easy and support is excellent. Invoices are ZATCA compliant automatically. Installments with Tabby increased my sales by 35%.</span>"</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center"><span class="text-xs font-bold text-neutral-500"><span class="lang-ar">ن</span><span class="lang-en">N</span></span></div>
+                    <div>
+                        <p class="text-small font-bold text-neutral-900"><span class="lang-ar">نورة الشمري</span><span class="lang-en">Noura Al-Shammari</span></p>
+                        <p class="text-xs text-neutral-400"><span class="lang-ar">صاحبة متجر عطور</span><span class="lang-en">Perfume Store Owner</span></p>
+                    </div>
+                </div>
+            </div>
+                        <div class="card-hover rounded-card border border-neutral-200 bg-white p-6 reveal-child">
+                <div class="flex gap-1 mb-4">
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                        <svg class="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                    </div>
+                <p class="text-small text-neutral-600 leading-relaxed mb-4">"<span class="lang-ar">من أول ما جربت دكاني حسّيت إنها مصممة لي. طلباتي زادت 40% من أول شهر والتطبيق خلاني أدير المتجر من أي مكان.</span><span class="lang-en">From the moment I tried Dukkani, I felt it was made for me. Orders increased 40% in the first month and the app lets me manage my store from anywhere.</span>"</p>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-neutral-200 flex items-center justify-center"><span class="text-xs font-bold text-neutral-500"><span class="lang-ar">م</span><span class="lang-en">M</span></span></div>
+                    <div>
+                        <p class="text-small font-bold text-neutral-900"><span class="lang-ar">محمد العتيبي</span><span class="lang-en">Mohammed Al-Otaibi</span></p>
+                        <p class="text-xs text-neutral-400"><span class="lang-ar">صاحب متجر إلكترونيات</span><span class="lang-en">Electronics Store Owner</span></p>
+                    </div>
+                </div>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="pricing" class="py-20 bg-dark text-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 mb-4"><span class="lang-ar">خطط تناسب كل الأحجام</span><span class="lang-en">Plans for Every Size</span></h2>
+            <p class="text-small text-neutral-400 mb-8"><span class="lang-ar">ابدأ مجاناً وتوسّع حسب نموك — بدون عقود أو التزامات</span><span class="lang-en">Start free and scale as you grow — no contracts or commitments</span></p>
+            <div class="inline-flex items-center gap-4">
+                <span id="lbl-monthly" class="text-small font-semibold text-white"><span class="lang-ar">شهري</span><span class="lang-en">Monthly</span></span>
+                <button onclick="toggleBilling()" class="relative w-12 h-6 rounded-full bg-neutral-600 cursor-pointer">
+                    <div id="billing-dot" class="toggle-knob absolute top-0.5 right-0.5 w-5 h-5 bg-white rounded-full shadow-sm"></div>
+                </button>
+                <span id="lbl-yearly" class="text-small text-neutral-400"><span class="lang-ar">سنوي</span><span class="lang-en">Yearly</span> <span class="text-emerald-400 text-xs"><span class="lang-ar">(وفّر 17%)</span><span class="lang-en">(Save 17%)</span></span></span>
+            </div>
+        </div>
+        <div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto items-start">
+
+            <div class="rounded-card bg-dark-50 border border-white/10 p-6 reveal-child">
+                <h3 class="text-body font-bold mb-1"><span class="lang-ar">المبتدئ</span><span class="lang-en">Starter</span></h3>
+                <p class="text-xs text-neutral-500 mb-6"><span class="lang-ar">للبدء واكتشاف المنصة</span><span class="lang-en">To start and explore the platform</span></p>
+                <p class="text-4xl font-bold mb-1"><span class="lang-ar">مجاناً</span><span class="lang-en">Free</span></p>
+                <p class="text-xs text-neutral-500 mb-6"><span class="lang-ar">+ 5% عمولة لكل طلب</span><span class="lang-en">+ 5% commission per order</span></p>
+                <a href="/signup" class="flex items-center justify-center w-full h-12 text-small font-semibold text-white border border-white/20 hover:bg-white/5 rounded-btn transition-colors mb-8"><span class="lang-ar">ابدأ الآن</span><span class="lang-en">Start Now</span></a>
+                <ul class="space-y-3 text-small text-neutral-400">
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">حتى 50 منتج</span><span class="lang-en">Up to 50 products</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">100 طلب/شهر</span><span class="lang-en">100 orders/month</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">عضوين في الفريق</span><span class="lang-en">2 team members</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">فواتير أساسية</span><span class="lang-en">Basic invoicing</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">دعم بالبريد</span><span class="lang-en">Email support</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">شهادة SSL مجانية</span><span class="lang-en">Free SSL certificate</span></li>
+                </ul>
+            </div>
+
+            <div class="rounded-card bg-white text-neutral-900 p-6 shadow-xl ring-2 ring-white/20 reveal-child">
+                <div class="flex items-center justify-between mb-1">
+                    <h3 class="text-body font-bold"><span class="lang-ar">النمو</span><span class="lang-en">Growth</span></h3>
+                    <span class="text-xs font-bold bg-black text-white px-3 py-1 rounded-full"><span class="lang-ar">الأكثر شيوعاً</span><span class="lang-en">Most Popular</span></span>
+                </div>
+                <p class="text-xs text-neutral-500 mb-6"><span class="lang-ar">للمتاجر الجادة في النمو</span><span class="lang-en">For stores serious about growth</span></p>
+                <div class="flex items-baseline gap-1 mb-1">
+                    <span class="text-4xl font-bold pricing-monthly">99</span>
+                    <span class="text-4xl font-bold pricing-yearly hidden">82</span>
+                    <span class="text-small text-neutral-500">ر.س/شهر</span>
+                </div>
+                <p class="text-xs text-neutral-400 mb-6"><span class="lang-ar">+ 3% عمولة لكل طلب</span><span class="lang-en">+ 3% commission per order</span></p>
+                <a href="/signup" class="flex items-center justify-center w-full h-12 text-small font-semibold text-white bg-black hover:bg-neutral-800 rounded-btn transition-colors mb-8"><span class="lang-ar">ابدأ تجربة مجانية</span><span class="lang-en">Start Free Trial</span></a>
+                <ul class="space-y-3 text-small text-neutral-600">
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">حتى 500 منتج</span><span class="lang-en">Up to 500 products</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">1,000 طلب/شهر</span><span class="lang-en">1,000 orders/month</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">5 أعضاء في الفريق</span><span class="lang-en">5 team members</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">فوترة ZATCA كاملة</span><span class="lang-en">Full ZATCA invoicing</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">كل بوابات الدفع + تابي وتمارا</span><span class="lang-en">All payment gateways + Tabby & Tamara</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">تطبيق جوال</span><span class="lang-en">Mobile app</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">تحليلات متقدمة</span><span class="lang-en">Advanced analytics</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-black shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">دعم أولوية (واتساب + هاتف)</span><span class="lang-en">Priority support (WhatsApp + phone)</span></li>
+                </ul>
+            </div>
+
+            <div class="rounded-card bg-dark-50 border border-white/10 p-6 reveal-child">
+                <h3 class="text-body font-bold mb-1"><span class="lang-ar">الاحترافي</span><span class="lang-en">Pro</span></h3>
+                <p class="text-xs text-neutral-500 mb-6"><span class="lang-ar">للمتاجر الكبيرة والمؤسسات</span><span class="lang-en">For large stores and enterprises</span></p>
+                <div class="flex items-baseline gap-1 mb-1">
+                    <span class="text-4xl font-bold pricing-monthly">599</span>
+                    <span class="text-4xl font-bold pricing-yearly hidden">499</span>
+                    <span class="text-small text-neutral-500">ر.س/شهر</span>
+                </div>
+                <p class="text-xs text-neutral-500 mb-6"><span class="lang-ar">+ 1.5% عمولة فقط</span><span class="lang-en">+ 1.5% commission only</span></p>
+                <a href="/signup" class="flex items-center justify-center w-full h-12 text-small font-semibold text-white border border-white/20 hover:bg-white/5 rounded-btn transition-colors mb-8"><span class="lang-ar">تواصل معنا</span><span class="lang-en">Contact Us</span></a>
+                <ul class="space-y-3 text-small text-neutral-400">
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">منتجات وطلبات غير محدودة</span><span class="lang-en">Unlimited products & orders</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">15 عضو في الفريق</span><span class="lang-en">15 team members</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">مدير حساب مخصص</span><span class="lang-en">Dedicated account manager</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">API كامل للتكامل</span><span class="lang-en">Full API for integration</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">نطاق مخصص مجاني</span><span class="lang-en">Free custom domain</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">نسخ احتياطي يومي</span><span class="lang-en">Daily backups</span></li>
+                    <li class="flex items-center gap-3"><svg class="w-4 h-4 text-neutral-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/></svg><span class="lang-ar">أولوية قصوى في الدعم</span><span class="lang-en">Top priority support</span></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<section id="faq" class="py-20 bg-white">
+    <div class="max-w-site mx-auto px-6">
+        <div class="text-center mb-12 reveal">
+            <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">الأسئلة الشائعة</span><span class="lang-en">Frequently Asked Questions</span></h2>
+            <p class="text-body text-neutral-500"><span class="lang-ar">أجوبة على أكثر الأسئلة اللي بتوصلنا</span><span class="lang-en">Answers to the most common questions we receive</span></p>
+        </div>
+        <div class="max-w-2xl mx-auto space-y-4">
+                                    <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(0)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">هل أحتاج خبرة تقنية لإنشاء متجري؟</span><span class="lang-en">Do I need technical experience to create my store?</span></span>
+                    <svg id="faq-icon-0" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-0" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">لا أبداً. دكاني مصمم ليكون سهل الاستخدام لأي شخص. معالج الإعداد السريع يرشدك خطوة بخطوة — من تسمية المتجر لإضافة أول منتج. معظم التجار يطلقون متاجرهم في أقل من ساعة.</span><span class="lang-en">Not at all. Dukkani is designed to be easy for anyone. The quick setup wizard guides you step by step — from naming your store to adding your first product. Most merchants launch in under an hour.</span></p>
+                </div>
+            </div>
+                        <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(1)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">هل المنصة متوافقة مع متطلبات ZATCA؟</span><span class="lang-en">Is the platform ZATCA compliant?</span></span>
+                    <svg id="faq-icon-1" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-1" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">نعم 100%. دكاني متوافق مع المرحلة الثانية من الفوترة الإلكترونية. كل فاتورة تُصدر تلقائياً بـ QR Code وتوقيع رقمي ECDSA ورقم ضريبي — بدون أي تدخل منك.</span><span class="lang-en">Yes, 100%. Dukkani is Phase 2 e-invoicing compliant. Every invoice is automatically generated with QR Code, ECDSA digital signature, and tax number — no manual work needed.</span></p>
+                </div>
+            </div>
+                        <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(2)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">ما بوابات الدفع المدعومة؟</span><span class="lang-en">What payment gateways are supported?</span></span>
+                    <svg id="faq-icon-2" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-2" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">ندعم مدى (الأكثر استخداماً في السعودية)، فيزا، ماستركارد، Apple Pay، والدفع عند الاستلام. بالإضافة لخدمات التقسيط مع تابي وتمارا. كل البوابات مدمجة وجاهزة — بس فعّلها من الإعدادات.</span><span class="lang-en">We support mada (most used in Saudi), Visa, Mastercard, Apple Pay, and COD. Plus installment services with Tabby and Tamara. All gateways are built in — just enable them in settings.</span></p>
+                </div>
+            </div>
+                        <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(3)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">هل أقدر أدير متجري من الجوال؟</span><span class="lang-en">Can I manage my store from mobile?</span></span>
+                    <svg id="faq-icon-3" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-3" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">نعم. باقة النمو والاحترافي تتضمن تطبيق جوال لمتجرك على iOS و Android بتقنية NativePHP. تقدر تدير الطلبات والمنتجات والإشعارات من أي مكان.</span><span class="lang-en">Yes. Growth and Pro plans include a mobile app for iOS &amp; Android with NativePHP. Manage orders, products, and notifications from anywhere.</span></p>
+                </div>
+            </div>
+                        <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(4)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">كيف يتم حساب العمولة؟</span><span class="lang-en">How is the commission calculated?</span></span>
+                    <svg id="faq-icon-4" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-4" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">العمولة تُحسب كنسبة من قيمة كل طلب مكتمل. الباقة المجانية 5%، النمو 3%، والاحترافي 1.5% فقط. المبالغ تُحوّل لحسابك بعد 7 أيام من تأكيد الطلب.</span><span class="lang-en">Commission is a percentage of each completed order. Free plan: 5%, Growth: 3%, Pro: 1.5%. Funds are transferred to your account 7 days after order confirmation.</span></p>
+                </div>
+            </div>
+                        <div class="border border-neutral-200 rounded-card overflow-hidden reveal-child">
+                <button onclick="toggleFaq(5)" class="w-full flex items-center justify-between p-6 text-right hover:bg-neutral-50 transition-colors">
+                    <span class="text-small font-bold text-neutral-900 pr-4"><span class="lang-ar">هل أقدر أنقل متجري من منصة ثانية؟</span><span class="lang-en">Can I migrate my store from another platform?</span></span>
+                    <svg id="faq-icon-5" class="faq-icon w-6 h-6 text-neutral-400 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m6-6H6"/></svg>
+                </button>
+                <div id="faq-answer-5" class="faq-answer px-6">
+                    <p class="text-small text-neutral-500 leading-relaxed pb-6"><span class="lang-ar">نعم. نوفر أداة استيراد تساعدك تنقل منتجاتك وعملائك بسهولة. فريق الدعم جاهز يساعدك في عملية النقل مجاناً لباقة النمو والاحترافي.</span><span class="lang-en">Yes. We provide an import tool to easily migrate your products and customers. Our support team will assist you with migration for free on Growth and Pro plans.</span></p>
+                </div>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section class="py-12 bg-neutral-50 border-y border-neutral-100 overflow-hidden">
+    <div class="relative">
+        <div class="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-neutral-50 to-transparent z-10 pointer-events-none"></div>
+        <div class="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-neutral-50 to-transparent z-10 pointer-events-none"></div>
+        <div class="marquee-track" style="animation-duration:25s;">
+                        <div class="flex items-center gap-16 px-8 shrink-0">
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">شهادة SSL مجانية</span><span class="lang-en">Free SSL Certificate</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">تشفير كامل لبيانات متجرك</span><span class="lang-en">Full encryption for your store data</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">ZATCA المرحلة الثانية</span><span class="lang-en">ZATCA Phase 2</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">فوترة إلكترونية معتمدة</span><span class="lang-en">Certified e-invoicing</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">مدفوعات آمنة</span><span class="lang-en">Secure Payments</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">بوابات دفع موثوقة ومرخصة</span><span class="lang-en">Trusted & licensed payment gateways</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">نسخ احتياطي يومي</span><span class="lang-en">Daily Backups</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">بياناتك محمية دائماً</span><span class="lang-en">Your data is always protected</span></p></div>
+                </div>
+            </div>
+                        <div class="flex items-center gap-16 px-8 shrink-0">
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">شهادة SSL مجانية</span><span class="lang-en">Free SSL Certificate</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">تشفير كامل لبيانات متجرك</span><span class="lang-en">Full encryption for your store data</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">ZATCA المرحلة الثانية</span><span class="lang-en">ZATCA Phase 2</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">فوترة إلكترونية معتمدة</span><span class="lang-en">Certified e-invoicing</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">مدفوعات آمنة</span><span class="lang-en">Secure Payments</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">بوابات دفع موثوقة ومرخصة</span><span class="lang-en">Trusted & licensed payment gateways</span></p></div>
+                </div>
+                <div class="flex items-center gap-3 shrink-0">
+                    <svg class="w-7 h-7 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125"/></svg>
+                    <div><p class="text-small font-bold text-neutral-800"><span class="lang-ar">نسخ احتياطي يومي</span><span class="lang-en">Daily Backups</span></p><p class="text-xs text-neutral-400"><span class="lang-ar">بياناتك محمية دائماً</span><span class="lang-en">Your data is always protected</span></p></div>
+                </div>
+            </div>
+                    </div>
+    </div>
+</section>
+
+
+
+
+
+<section class="py-20 bg-[#f7f5f2]">
+    <div class="max-w-2xl mx-auto px-6 text-center reveal">
+        <h2 class="text-h2 text-neutral-900 mb-4"><span class="lang-ar">جاهز تبدأ رحلتك في التجارة الإلكترونية؟</span><span class="lang-en">Ready to Start Your E-Commerce Journey?</span></h2>
+        <p class="text-body text-neutral-500 mb-8"><span class="lang-ar">انضم لآلاف التجار السعوديين اللي يكبرون مع دكاني. ابدأ مجاناً اليوم — بدون بطاقة ائتمانية.</span><span class="lang-en">Join thousands of Saudi merchants growing with Dukkani. Start free today — no credit card needed.</span></p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="/signup" class="inline-flex items-center justify-center gap-2 h-12 px-8 text-small font-semibold text-white bg-black hover:bg-neutral-800 rounded-btn transition-colors">
+                <span class="lang-ar">ابدأ مجاناً الآن</span><span class="lang-en">Start Free Now</span>
+                <svg class="w-4 h-4 rotate-180" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6"/></svg>
+            </a>
+            <a href="#pricing" class="inline-flex items-center justify-center gap-2 h-12 px-8 text-small font-semibold text-neutral-700 border border-neutral-300 hover:border-neutral-400 rounded-btn transition-colors bg-white"><span class="lang-ar">قارن الباقات</span><span class="lang-en">Compare Plans</span></a>
+        </div>
+    </div>
+</section>
+
+
+
+
+
+<footer class="bg-dark text-neutral-400 pt-16 pb-8">
+    <div class="max-w-site mx-auto px-6">
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
+            <div class="col-span-2 md:col-span-1">
+                <a href="/" class="flex items-center gap-2 mb-4">
+                    <div class="w-8 h-8 rounded-btn bg-white flex items-center justify-center">
+                        <svg class="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    </div>
+                    <span class="text-body font-bold text-white"><span class="lang-ar">دكاني</span><span class="lang-en">Dukkani</span></span>
+                </a>
+                <p class="text-xs text-neutral-500 leading-relaxed"><span class="lang-ar">منصة التجارة الإلكترونية المتكاملة للتجار السعوديين. متوافقة مع ZATCA.</span><span class="lang-en">The complete e-commerce platform for Saudi merchants. ZATCA compliant.</span></p>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-white mb-4"><span class="lang-ar">المنتج</span><span class="lang-en">Product</span></h4>
+                <ul class="space-y-3">
+                    <li><a href="#features" class="text-xs hover:text-white transition-colors"><span class="lang-ar">المزايا</span><span class="lang-en">Features</span></a></li>
+                    <li><a href="#pricing" class="text-xs hover:text-white transition-colors"><span class="lang-ar">الأسعار</span><span class="lang-en">Pricing</span></a></li>
+                    <li><a href="#how-it-works" class="text-xs hover:text-white transition-colors"><span class="lang-ar">كيف يعمل</span><span class="lang-en">How It Works</span></a></li>
+                    <li><a href="#faq" class="text-xs hover:text-white transition-colors"><span class="lang-ar">الأسئلة الشائعة</span><span class="lang-en">FAQ</span></a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-white mb-4"><span class="lang-ar">الشركة</span><span class="lang-en">Company</span></h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">عن دكاني</span><span class="lang-en">About Dukkani</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">المدونة</span><span class="lang-en">Blog</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">تواصل معنا</span><span class="lang-en">Contact Us</span></a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-white mb-4"><span class="lang-ar">الدعم</span><span class="lang-en">Support</span></h4>
+                <ul class="space-y-3">
+                    <li><a href="#faq" class="text-xs hover:text-white transition-colors"><span class="lang-ar">الأسئلة الشائعة</span><span class="lang-en">FAQ</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">مركز المساعدة</span><span class="lang-en">Help Center</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">وثائق API</span><span class="lang-en">API Docs</span></a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold text-white mb-4"><span class="lang-ar">القانونية</span><span class="lang-en">Legal</span></h4>
+                <ul class="space-y-3">
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">شروط الخدمة</span><span class="lang-en">Terms of Service</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">سياسة الخصوصية</span><span class="lang-en">Privacy Policy</span></a></li>
+                    <li><a href="#" class="text-xs hover:text-white transition-colors"><span class="lang-ar">سياسة الاسترجاع</span><span class="lang-en">Refund Policy</span></a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/[0.06] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <p class="text-xs text-neutral-500"><span class="lang-ar">جميع الحقوق محفوظة لدكاني</span><span class="lang-en">All rights reserved Dukkani</span> &copy; 2026</p>
+            <div class="flex items-center gap-6">
+                <a href="#" class="text-neutral-500 hover:text-white transition-colors"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+                <a href="#" class="text-neutral-500 hover:text-white transition-colors"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg></a>
+                <a href="#" class="text-neutral-500 hover:text-white transition-colors"><svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.27 6.27 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V8.75a8.18 8.18 0 004.76 1.52V6.84a4.84 4.84 0 01-1-.15z"/></svg></a>
+            </div>
+        </div>
+    </div>
+</footer>
+
+
+<script>
+// Language toggle
+function toggleLang() {
+    const html = document.documentElement;
+    const isAr = html.getAttribute('lang') === 'ar';
+    if (isAr) {
+        html.setAttribute('lang', 'en');
+        html.setAttribute('dir', 'ltr');
+        document.title = 'Dukkani — Build Your Store. Own Your Brand. Grow Without Limits.';
+    } else {
+        html.setAttribute('lang', 'ar');
+        html.setAttribute('dir', 'rtl');
+        document.title = 'دكاني — ابني متجرك. امتلك علامتك. وانطلق بلا حدود.';
+    }
+    localStorage.setItem('dukkani-lang', html.getAttribute('lang'));
+}
+// Restore saved language
+(function() {
+    const saved = localStorage.getItem('dukkani-lang');
+    if (saved === 'en') {
+        document.documentElement.setAttribute('lang', 'en');
+        document.documentElement.setAttribute('dir', 'ltr');
+        document.title = 'Dukkani — Build Your Store. Own Your Brand. Grow Without Limits.';
+    }
+})();
+
+let isYearly = false;
+function toggleBilling() {
+    isYearly = !isYearly;
+    const dot = document.getElementById('billing-dot');
+    const m = document.getElementById('lbl-monthly');
+    const y = document.getElementById('lbl-yearly');
+    if (isYearly) { dot.style.transform = 'translateX(-24px)'; m.className = 'text-small text-neutral-400'; y.className = 'text-small font-semibold text-white'; }
+    else { dot.style.transform = 'translateX(0)'; m.className = 'text-small font-semibold text-white'; y.className = 'text-small text-neutral-400'; }
+    document.querySelectorAll('.pricing-monthly').forEach(el => el.classList.toggle('hidden'));
+    document.querySelectorAll('.pricing-yearly').forEach(el => el.classList.toggle('hidden'));
+}
+
+function toggleFaq(index) {
+    const answer = document.getElementById('faq-answer-' + index);
+    const icon = document.getElementById('faq-icon-' + index);
+    const isOpen = answer.classList.contains('open');
+    document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
+    document.querySelectorAll('.faq-icon').forEach(i => i.classList.remove('open'));
+    if (!isOpen) { answer.classList.add('open'); icon.classList.add('open'); }
+}
+
+// Navbar scroll: transparent on hero, white after
+const nav = document.getElementById('navbar');
+const heroEnd = document.querySelector('#features').offsetTop - 80;
+window.addEventListener('scroll', () => {
+    if (window.scrollY > 60) { nav.classList.add('scrolled'); }
+    else { nav.classList.remove('scrolled'); }
+});
+
+// Scroll reveal animations
+const revealObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            revealObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.15 });
+
+document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+// Stagger children
+const staggerObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const parent = entry.target;
+            const children = parent.querySelectorAll('.reveal-child');
+            children.forEach((child, i) => {
+                child.style.transitionDelay = (i * 100) + 'ms';
+                child.classList.add('visible');
+            });
+            staggerObserver.unobserve(parent);
+        }
+    });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('.reveal-child').forEach(el => {
+    const parent = el.parentElement;
+    if (parent && !parent.dataset.staggered) {
+        parent.dataset.staggered = '1';
+        staggerObserver.observe(parent);
+    }
+});
+
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', function(e) {
+        e.preventDefault();
+        const t = document.querySelector(this.getAttribute('href'));
+        if (t) t.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        const mob = document.getElementById('mob-menu');
+        if (mob) mob.classList.add('hidden');
+    });
+});
+</script>
+</body>
+</html>

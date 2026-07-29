@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+*.log
+*.bak*
+*.before-*
+accounts.json
+tenants.json
+social_identities.json
+.env
+.env.*
+!.env.example

@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دكاني — إنشاء حساب جديد</title>
+<style>
+  :root{
+    --pur:#7c3aed; --pur-d:#6d28d9; --bg:#f3f4f6; --card:#fff;
+    --txt:#111827; --soft:#374151; --line:#e5e7eb; --muted:#9ca3af; --red:#ef4444;
+  }
+  *{box-sizing:border-box;font-family:"Segoe UI",Tahoma,system-ui,sans-serif}
+  body{margin:0;background:var(--bg);color:var(--txt);min-height:100vh}
+  /* شارة "متجر تجريبي" أعلى اليسار */
+  .badge{position:fixed;top:22px;left:22px;display:inline-flex;align-items:center;gap:7px;
+    padding:9px 15px;border:1.5px solid var(--pur);color:var(--pur);border-radius:11px;
+    font-weight:800;font-size:14px;background:#fff}
+  .wrap{display:flex;justify-content:center;padding:56px 16px 40px}
+  .card{width:100%;max-width:520px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:40px 44px;box-shadow:0 1px 3px rgba(0,0,0,.04)}
+  .brand{text-align:center;font-weight:800;font-size:18px;margin:0 0 14px}
+  h1{text-align:center;font-size:30px;font-weight:800;margin:0 0 10px}
+  .sub{text-align:center;margin:0 0 26px;font-size:15px;color:var(--soft)}
+  .sub a{color:var(--pur);text-decoration:none;font-weight:700}
+  label{display:block;font-size:15px;font-weight:700;margin:0 0 8px;color:var(--soft)}
+  label .req{color:var(--red);margin-inline-start:3px}
+  input,select{width:100%;height:52px;padding:0 15px;background:#fff;border:1.5px solid var(--line);
+    border-radius:11px;font-size:15px;color:var(--txt);transition:border-color .15s}
+  input:focus,select:focus{outline:none;border-color:var(--pur);box-shadow:0 0 0 3px rgba(124,58,237,.12)}
+  input::placeholder{color:var(--muted)}
+  .field{margin-bottom:20px}
+  /* صف كود الدولة + رقم الجوال */
+  .phone-row{display:flex;gap:12px}
+  .phone-row .cc{flex:0 0 132px}
+  .phone-row .pn{flex:1}
+  select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");
+    background-repeat:no-repeat;background-position:left 14px center;padding-left:38px;
+    text-align:right;direction:rtl;cursor:pointer}
+  .btn{width:100%;height:54px;margin-top:6px;background:var(--pur);color:#fff;border:none;
+    border-radius:11px;font-size:16px;font-weight:800;cursor:pointer;transition:background .15s}
+  .btn:hover{background:var(--pur-d)}
+  .btn:disabled{opacity:.6;cursor:progress}
+  .or{display:flex;align-items:center;gap:14px;margin:26px 0;color:var(--muted);font-size:14px}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .social{width:100%;height:52px;display:flex;align-items:center;justify-content:center;gap:10px;
+    background:#fff;border:1.5px solid var(--line);border-radius:11px;font-size:15px;font-weight:600;
+    color:var(--txt);cursor:pointer;margin-bottom:12px}
+  .social:hover{background:#fafafa}
+  .msg{margin-top:18px;padding:13px 15px;border-radius:11px;font-size:14px;font-weight:600;display:none}
+  .msg.ok{display:block;background:#ecfdf5;color:#047857;border:1px solid #a7f3d0}
+  .msg.err{display:block;background:#fef2f2;color:#b91c1c;border:1px solid #fecaca}
+  .msg.info{display:block;background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe}
+</style>
+</head>
+<body>
+  <div class="badge">🛍️ متجر تجريبي</div>
+
+  <div class="wrap">
+    <div class="card">
+      <div class="brand">دكاني</div>
+      <h1>إنشاء حساب جديد</h1>
+      <p class="sub"><a href="#">سجل الدخول لحسابك</a> أو</p>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="name">الاسم الكامل<span class="req">*</span></label>
+          <input id="name" required placeholder="">
+        </div>
+
+        <div class="field">
+          <label for="email">البريد الإلكتروني<span class="req">*</span></label>
+          <input id="email" type="email" required placeholder="">
+        </div>
+
+        <div class="field">
+          <div class="phone-row">
+            <div class="cc">
+              <label for="cc">كود الدولة<span class="req">*</span></label>
+              <select id="cc">
+                <option value="966" data-country="Saudi Arabia" data-cur="SAR">🇸🇦 ‎966+</option>
+                <option value="20"  data-country="Egypt"        data-cur="EGP">🇪🇬 ‎20+</option>
+                <option value="249" data-country="Sudan"        data-cur="SDG">🇸🇩 ‎249+</option>
+              </select>
+            </div>
+            <div class="pn">
+              <label for="phone">رقم الجوال</label>
+              <input id="phone" inputmode="numeric" placeholder="5xxxxxxxx">
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn" id="btn">إنشاء حساب</button>
+      </form>
+
+      <div class="or">أو</div>
+      <button class="social" type="button" onclick="soon()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.56-2.76c-.98.66-2.23 1.06-3.72 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"/><path fill="#FBBC05" d="M5.84 14.09a6.6 6.6 0 0 1 0-4.18V7.07H2.18a11 11 0 0 0 0 9.86l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84C6.71 7.31 9.14 5.38 12 5.38z"/></svg>
+        تسجيل الدخول بحساب Google
+      </button>
+      <button class="social" type="button" onclick="soon()">
+         تسجيل الدخول بحساب Apple
+      </button>
+
+      <div class="msg" id="msg"></div>
+    </div>
+  </div>
+
+<script>
+  const API = location.origin;   // نفس السيرفر اللي بيقدّم الصفحة
+  const $ = id => document.getElementById(id);
+  const show = (cls, html) => { const m=$("msg"); m.className="msg "+cls; m.innerHTML=html; };
+  function soon(){ show("info","تسجيل Google/Apple هيتفعّل لاحقًا في مرحلة الربط."); }
+
+  $("form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const name  = $("name").value.trim();
+    const email = $("email").value.trim();
+    const phone = $("phone").value.trim();
+    const opt   = $("cc").selectedOptions[0];
+    const payload = {
+      full_name: name, email, phone,
+      country_code: $("cc").value,
+      country: opt.dataset.country,
+      currency: opt.dataset.cur,
+    };
+    if (name.length < 2)      return show("err","اكتب الاسم الكامل.");
+    if (!email.includes("@")) return show("err","بريد إلكتروني غير صالح.");
+    if (phone.length < 6)     return show("err","رقم جوال غير صالح.");
+
+    $("btn").disabled = true; $("btn").textContent = "جارٍ إنشاء الحساب…";
+    try{
+      const r = await fetch(API + "/register", {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify(payload)
+      });
+      const d = await r.json();
+      if(!r.ok){ show("err", d.detail || "تعذّر إنشاء الحساب."); }
+      else {
+        show("ok", `✅ تم إنشاء حسابك (${payload.country}).<br>الخطوة الجاية: إعداد متجرك.`);
+        $("form").reset();
+      }
+    }catch(err){ show("err","تعذّر الاتصال بالخادم — تأكد أنه شغّال."); }
+    finally{ $("btn").disabled=false; $("btn").textContent="إنشاء حساب"; }
+  });
+</script>
+</body>
+</html>

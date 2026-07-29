@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>أدمن منصة دكاني</title>
+<style>
+  :root{--bg:#f4f5f7;--card:#fff;--ink:#1f2937;--soft:#4b5563;--faint:#9ca3af;--line:#e5e7eb;
+    --acc:#7c3aed;--acc-soft:#ede9fe;--ok:#16a34a;--err:#dc2626;
+    --font:"Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;--mono:ui-monospace,Menlo,monospace;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font-family:var(--font);padding:28px}
+  .wrap{max-width:1080px;margin:0 auto}
+  .head{display:flex;align-items:center;justify-content:flex-end;gap:14px;margin-bottom:18px}
+  .head .txt{text-align:left}
+  .head h1{margin:0;font-size:26px}
+  .head .sub{color:var(--faint);font-size:13.5px;margin-top:2px}
+  .logo{width:52px;height:52px;border-radius:14px;background:var(--acc);display:flex;align-items:center;
+    justify-content:center;font-size:26px;flex:none}
+  .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;
+    box-shadow:0 6px 24px rgba(0,0,0,.05)}
+  .kpi .lbl{color:var(--faint);font-size:13px;font-weight:700;margin-bottom:8px}
+  .kpi .val{font-size:28px;font-weight:800;line-height:1}
+  .kpi.hero{background:linear-gradient(135deg,#7c3aed,#6d28d9);border-color:transparent;color:#fff}
+  .kpi.hero .lbl{color:#e9d5ff}
+  @media (max-width:760px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  .bar{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:14px}
+  .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:13px 16px;font-size:13.5px;color:var(--soft)}
+  .msg.err{color:var(--err);border-color:#fecaca;background:#fef2f2}
+  .msg a{color:var(--acc);font-weight:700}
+  button{padding:11px 18px;background:var(--acc);color:#fff;border:none;border-radius:10px;font-family:inherit;
+    font-weight:800;font-size:13.5px;cursor:pointer}
+  button:hover{filter:brightness(1.08)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .tablecard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 6px 24px rgba(0,0,0,.05)}
+  table{width:100%;border-collapse:collapse}
+  thead th{background:var(--acc-soft);color:#5b21b6;font-size:13px;font-weight:800;padding:14px 16px;text-align:center}
+  thead th:first-child{text-align:right}
+  tbody td{padding:14px 16px;border-top:1px solid var(--line);font-size:13.5px;text-align:center;vertical-align:middle}
+  tbody td:first-child{text-align:right}
+  .m-name{font-weight:800}
+  .m-owner{color:var(--faint);font-size:12px;font-family:var(--mono);direction:ltr}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:#dcfce7;color:#166534;font-weight:700;
+    font-size:12px;padding:4px 10px;border-radius:999px}
+  .pill .d{width:7px;height:7px;border-radius:50%;background:#22c55e}
+  .store a{color:var(--acc);font-family:var(--mono);direction:ltr;text-decoration:none;font-size:12.5px}
+  .store a:hover{text-decoration:underline}
+  .rev{font-weight:800}
+  .empty{padding:26px;text-align:center;color:var(--faint)}
+  .tip{margin-top:14px;font-size:12.5px;color:var(--faint)}
+  .spin{display:inline-block;width:14px;height:14px;border:2px solid var(--line);border-top-color:var(--acc);
+    border-radius:50%;animation:s .8s linear infinite;vertical-align:middle;margin-left:6px}
+  @keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <div class="txt">
+        <h1>أدمن منصة دكاني</h1>
+        <div class="sub">إشراف حيّ على كل التجّار</div>
+      </div>
+      <div class="logo">🛍️</div>
+    </div>
+
+    <div class="kpis" id="kpis">
+      <div class="kpi hero"><div class="lbl">إجمالي مبيعات المنصة</div><div class="val" id="k-rev">—</div></div>
+      <div class="kpi"><div class="lbl">عدد التجّار</div><div class="val" id="k-merch">—</div></div>
+      <div class="kpi"><div class="lbl">إجمالي الطلبات</div><div class="val" id="k-ord">—</div></div>
+      <div class="kpi"><div class="lbl">إجمالي المنتجات</div><div class="val" id="k-prod">—</div></div>
+    </div>
+
+    <div class="bar">
+      <button id="refresh" onclick="load()">🔄 تحديث</button>
+      <div class="msg" id="msg" style="display:none"></div>
+    </div>
+
+    <div class="tablecard">
+      <table>
+        <thead>
+          <tr>
+            <th>التاجر</th><th>الحالة</th><th>المنتجات</th><th>العملاء</th>
+            <th>الطلبات</th><th>المبيعات</th><th>المتجر</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="7" class="empty"><span class="spin"></span> جارٍ التحميل…</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="tip">💡 الأرقام دي بتيجي من سجل التجّار (Merchant). لتحديث الأرقام من المتاجر شغّلي <code>sync_merchants_win.py</code>.</div>
+  </div>
+
+<script>
+  const PORT = "8090";
+  const msg = document.getElementById("msg");
+  function showMsg(html, isErr){ msg.style.display="block"; msg.className = "msg" + (isErr?" err":""); msg.innerHTML = html; }
+  function hideMsg(){ msg.style.display="none"; }
+  function money(v){ return (v||0).toLocaleString("ar-EG"); }
+
+  async function load(){
+    const rows = document.getElementById("rows");
+    rows.innerHTML = '<tr><td colspan="7" class="empty"><span class="spin"></span> جارٍ التحميل…</td></tr>';
+    hideMsg();
+    const fields = encodeURIComponent(JSON.stringify(
+      ["merchant_name","owner_email","status","products","customers","orders","revenue","site_url"]));
+    try {
+      const r = await fetch("/api/resource/Merchant?fields="+fields+"&limit_page_length=0",
+                            { headers:{ "Accept":"application/json" }, credentials:"same-origin" });
+      if (r.status === 403 || r.status === 401) {
+        rows.innerHTML = '<tr><td colspan="7" class="empty">—</td></tr>';
+        showMsg('تعذّر التحميل — سجّل الدخول أولاً. <a href="/login?redirect-to=/platform">تسجيل الدخول</a>', true);
+        return;
+      }
+      const data = (await r.json()).data || [];
+      // كروت الملخّص
+      const sum = (k)=> data.reduce((a,m)=> a + (Number(m[k])||0), 0);
+      document.getElementById("k-rev").textContent   = money(sum("revenue")) + " ﷼";
+      document.getElementById("k-merch").textContent = data.length;
+      document.getElementById("k-ord").textContent   = sum("orders");
+      document.getElementById("k-prod").textContent  = sum("products");
+      if (!data.length){ rows.innerHTML = '<tr><td colspan="7" class="empty">لا يوجد تجّار بعد.</td></tr>'; return; }
+      rows.innerHTML = data.map(m => {
+        const url = "http://" + m.site_url + ":" + PORT;
+        return '<tr>'
+          + '<td><div class="m-name">'+(m.merchant_name||m.site_url)+'</div>'
+          +     '<div class="m-owner">'+(m.owner_email||"")+'</div></td>'
+          + '<td><span class="pill"><span class="d"></span>'+(m.status||"Active")+'</span></td>'
+          + '<td>'+(m.products||0)+'</td>'
+          + '<td>'+(m.customers||0)+'</td>'
+          + '<td>'+(m.orders||0)+'</td>'
+          + '<td class="rev">'+money(m.revenue)+' ﷼</td>'
+          + '<td class="store"><a href="'+url+'" target="_blank">'+m.site_url+':'+PORT+'</a></td>'
+          + '</tr>';
+      }).join("");
+      showMsg('تم تحميل '+data.length+' تاجر ✓', false);
+    } catch(e){
+      rows.innerHTML = '<tr><td colspan="7" class="empty">—</td></tr>';
+      showMsg('تعذّر الاتصال بالخادم.', true);
+    }
+  }
+  load();
+</script>
+</body>
+</html>

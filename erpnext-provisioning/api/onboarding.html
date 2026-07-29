@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>دكاني — إنشاء متجرك</title>
+<style>
+  :root{--bg:#0c1417;--card:#121f24;--in:#17272d;--ink:#eaf1f3;--soft:#a9bbc2;--faint:#7d919a;
+    --line:#23353c;--acc:#2bc0b6;--acc2:#7ee0d8;--ok:#45c47c;--err:#ef6a63;--mono:ui-monospace,Menlo,monospace;
+    --font:"Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;}
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:radial-gradient(1200px 600px at 70% -10%,#123734 0%,var(--bg) 55%);
+    color:var(--ink);font-family:var(--font);display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:440px;background:var(--card);border:1px solid var(--line);border-radius:18px;
+    padding:30px 28px;box-shadow:0 24px 60px rgba(0,0,0,.5)}
+  .brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:20px;margin-bottom:4px}
+  .brand .dot{width:10px;height:10px;border-radius:50%;background:var(--acc)}
+  .sub{color:var(--faint);font-size:13.5px;margin:0 0 22px}
+  label{display:block;font-size:13px;font-weight:700;margin:14px 0 6px;color:var(--soft)}
+  input{width:100%;padding:12px 13px;background:var(--in);border:1.5px solid var(--line);border-radius:10px;
+    color:var(--ink);font-family:inherit;font-size:14.5px;transition:border-color .15s}
+  input:focus{outline:none;border-color:var(--acc)}
+  .dom{display:flex;align-items:center;gap:0;direction:ltr}
+  .dom input{border-radius:0 10px 10px 0;text-align:left}
+  .dom .suffix{background:var(--in);border:1.5px solid var(--line);border-right:none;border-radius:10px 0 0 10px;
+    padding:12px 11px;color:var(--faint);font-family:var(--mono);font-size:13px;white-space:nowrap}
+  button{width:100%;margin-top:22px;padding:13px;background:var(--acc);color:#04211f;border:none;border-radius:10px;
+    font-family:inherit;font-weight:800;font-size:15px;cursor:pointer;transition:filter .15s}
+  button:hover:not(:disabled){filter:brightness(1.08)}
+  button:disabled{opacity:.55;cursor:not-allowed}
+  .status{margin-top:20px;padding:15px;border-radius:12px;background:var(--in);border:1px solid var(--line);
+    font-size:13.5px;display:none}
+  .status.show{display:block}
+  .row{display:flex;align-items:center;gap:9px;margin:5px 0}
+  .spin{width:15px;height:15px;border:2px solid var(--line);border-top-color:var(--acc);border-radius:50%;
+    animation:s .8s linear infinite;flex:none}
+  @keyframes s{to{transform:rotate(360deg)}}
+  .ok{color:var(--ok);font-weight:700}
+  .err{color:var(--err);font-weight:700}
+  .link{display:inline-block;margin-top:8px;color:var(--acc2);font-family:var(--mono);direction:ltr;text-decoration:none}
+  .link:hover{text-decoration:underline}
+  .hint{font-size:11.5px;color:var(--faint);margin-top:5px}
+  .api{margin-top:18px;font-size:11px;color:var(--faint);text-align:center}
+  .api code{font-family:var(--mono);color:var(--acc2)}
+  @media (prefers-reduced-motion:reduce){.spin{animation:none}}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="brand"><span class="dot"></span> دكاني</div>
+    <p class="sub">أنشئ متجرك على ERPNext في دقائق — عزل كامل ودومين خاص.</p>
+
+    <form id="f">
+      <label for="name">اسم المتجر</label>
+      <input id="name" required placeholder="مثال: متجر نور للأزياء" autocomplete="off">
+
+      <label for="sd">النطاق الفرعي</label>
+      <div class="dom">
+        <span class="suffix">.dukkani.ai</span>
+        <input id="sd" required placeholder="nourstore" autocomplete="off"
+               pattern="[a-z0-9][a-z0-9-]{1,30}[a-z0-9]">
+      </div>
+      <div class="hint">حروف إنجليزية صغيرة وأرقام و«-» فقط (3–32 حرفاً).</div>
+
+      <label for="email">البريد الإلكتروني (دخول التاجر)</label>
+      <input id="email" type="email" required placeholder="owner@nour.com" autocomplete="off">
+
+      <label for="pw">كلمة المرور (6 أحرف على الأقل)</label>
+      <input id="pw" type="password" required minlength="6" placeholder="••••••••" autocomplete="new-password">
+
+      <button type="submit" id="btn">🚀 أنشئ متجري</button>
+    </form>
+
+    <div class="status" id="st"></div>
+    <div class="api">API: <code id="apiurl"></code></div>
+  </div>
+
+<script>
+  const API = (location.protocol === "file:" ? "http://localhost:9000" : location.origin);
+  document.getElementById("apiurl").textContent = API;
+  const st = document.getElementById("st");
+  const btn = document.getElementById("btn");
+  let poll;
+
+  function show(html){ st.className = "status show"; st.innerHTML = html; }
+
+  document.getElementById("f").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    clearInterval(poll);
+    const merchant_name = document.getElementById("name").value.trim();
+    const subdomain = document.getElementById("sd").value.trim().toLowerCase();
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("pw").value;
+    btn.disabled = true;
+    show('<div class="row"><span class="spin"></span> جارٍ إرسال الطلب…</div>');
+
+    try {
+      const r = await fetch(API + "/tenants", {
+        method: "POST", headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ subdomain, merchant_name, email, password })
+      });
+      const data = await r.json();
+      if (!r.ok) {
+        const msg = Array.isArray(data.detail) ? data.detail.map(d=>d.msg).join("، ") : (data.detail || "خطأ");
+        show('<span class="err">✗ ' + msg + '</span>'); btn.disabled = false; return;
+      }
+      show('<div class="row"><span class="spin"></span> بدأ تجهيز متجرك… (قد يستغرق دقائق)</div>');
+      poll = setInterval(() => checkStatus(subdomain), 4000);
+      checkStatus(subdomain);
+    } catch (err) {
+      show('<span class="err">✗ تعذّر الاتصال بالـ API على ' + API + '</span><div class="hint">تأكدي أن الخدمة تعمل: sudo bash run.sh</div>');
+      btn.disabled = false;
+    }
+  });
+
+  async function checkStatus(subdomain){
+    try {
+      const r = await fetch(API + "/tenants/" + subdomain);
+      if (!r.ok) return;
+      const t = await r.json();
+      if (t.status === "ready") {
+        clearInterval(poll); btn.disabled = false;
+        show('<div class="row ok">✓ متجرك جاهز!</div>' +
+             '<a class="link" href="' + t.url + '" target="_blank">' + t.url + '</a>' +
+             '<div class="hint">الدخول: Administrator / admin</div>');
+      } else if (t.status === "failed") {
+        clearInterval(poll); btn.disabled = false;
+        show('<span class="err">✗ فشل التجهيز</span><div class="hint">' + (t.error||"") + '</div>');
+      } else {
+        show('<div class="row"><span class="spin"></span> الحالة: ' + t.status + ' …</div>');
+      }
+    } catch(e){ /* نتابع */ }
+  }
+</script>
+</body>
+</html>

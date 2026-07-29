@@ -1,0 +1,306 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>المتجر</title>
+<style>
+  :root{--bg:#f6f7f9;--card:#fff;--ink:#1f2937;--soft:#6b7280;--faint:#9ca3af;--line:#e5e7eb;
+    --acc:#7c3aed;--acc2:#6d28d9;--ok:#16a34a;--font:"Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font)}
+  header{background:var(--card);border-bottom:1px solid var(--line);padding:16px 22px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:20}
+  header .name{font-weight:800;font-size:20px}
+  .cartbtn{background:var(--acc);color:#fff;border:none;border-radius:10px;padding:10px 16px;
+    font-family:inherit;font-weight:700;font-size:14px;cursor:pointer;position:relative}
+  .cartbtn .count{position:absolute;top:-7px;left:-7px;background:#ef4444;color:#fff;border-radius:999px;
+    min-width:20px;height:20px;font-size:12px;display:flex;align-items:center;justify-content:center;padding:0 5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:24px 18px}
+  h2{font-size:22px;margin:0 0 18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:18px}
+  .prod{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .prod .img{height:150px;background:linear-gradient(135deg,#ede9fe,#f5f3ff);display:flex;align-items:center;justify-content:center;font-size:44px}
+  .prod .img{position:relative}
+  .prod .img img{width:100%;height:100%;object-fit:cover}
+  .soldout{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.9);border:1px solid var(--line);
+    border-radius:10px;padding:5px 10px;color:#dc2626;font-size:12px;font-weight:800}
+  .prod .body{padding:14px;display:flex;flex-direction:column;gap:8px;flex:1}
+  .prod .t{font-weight:700;font-size:15px}
+  .prod .d{color:var(--faint);font-size:12px;flex:1}
+  .prod .price{color:var(--acc);font-weight:800;font-size:16px}
+  .prod button{background:var(--acc);color:#fff;border:none;border-radius:9px;padding:10px;font-family:inherit;
+    font-weight:700;font-size:13.5px;cursor:pointer}
+  .prod button:hover{filter:brightness(1.08)}
+  .prod button:disabled{background:#e5e7eb;color:#6b7280;cursor:not-allowed;filter:none}
+  .empty{text-align:center;color:var(--faint);padding:50px}
+  /* Cart drawer */
+  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;z-index:30}
+  .overlay.show{display:block}
+  .drawer{position:fixed;top:0;left:0;height:100%;width:380px;max-width:92vw;background:var(--card);
+    z-index:40;transform:translateX(-100%);transition:transform .25s;display:flex;flex-direction:column;
+    overflow-y:auto;box-shadow:2px 0 24px rgba(0,0,0,.15)}
+  .drawer.show{transform:translateX(0)}
+  .drawer h3{margin:0;padding:18px;border-bottom:1px solid var(--line);font-size:18px;display:flex;
+    justify-content:space-between;position:sticky;top:0;background:var(--card);z-index:2}
+  .drawer .items{padding:14px 18px}
+  .ci{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+  .ci .ct{flex:1}
+  .ci .ct .n{font-weight:700;font-size:14px}
+  .ci .ct .p{color:var(--faint);font-size:12px}
+  .qty{display:flex;align-items:center;gap:8px}
+  .qty button{width:26px;height:26px;border:1px solid var(--line);background:#f9fafb;border-radius:6px;cursor:pointer;font-size:15px}
+  .drawer .foot{border-top:1px solid var(--line);padding:18px}
+  .drawer .total{display:flex;justify-content:space-between;font-weight:800;font-size:17px;margin-bottom:12px}
+  label{display:block;font-size:12.5px;font-weight:700;margin:10px 0 5px;color:var(--soft)}
+  input,textarea{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px}
+  input:focus,textarea:focus{outline:none;border-color:var(--acc)}
+  select{width:100%;padding:10px;border:1.5px solid var(--line);border-radius:9px;font-family:inherit;font-size:14px;background:#fff}
+  .locbtn{width:100%;margin-top:10px;background:#f5f3ff;color:var(--acc);border:1.5px solid #ddd6fe;border-radius:9px;
+    padding:11px;font-family:inherit;font-weight:700;font-size:13.5px;cursor:pointer}
+  .locbtn:hover{background:#ede9fe}
+  .locnote{font-size:12px;color:var(--soft);margin-top:6px;min-height:16px}
+  .locnote a{color:var(--acc);font-weight:700}
+  .pays{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+  .pay{display:flex;align-items:center;gap:8px;border:1.5px solid var(--line);border-radius:9px;padding:11px;
+    cursor:pointer;font-size:13.5px;font-weight:600;margin:0}
+  .pay.selected{border-color:var(--acc);background:#f5f3ff}
+  .testbanner{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;border-radius:9px;padding:11px;
+    font-size:12.5px;font-weight:600;text-align:center}
+  .buy{width:100%;margin-top:14px;background:var(--acc);color:#fff;border:none;border-radius:10px;padding:13px;
+    font-family:inherit;font-weight:800;font-size:15px;cursor:pointer}
+  .buy:disabled{opacity:.55;cursor:not-allowed}
+  .done{text-align:center;padding:30px 18px}
+  .done .ic{font-size:52px}
+  .done .ok{color:var(--ok);font-weight:800;font-size:19px;margin:10px 0}
+  .msg{color:#dc2626;font-size:13px;margin-top:8px}
+  .spin{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--acc);
+    border-radius:50%;animation:s .8s linear infinite;vertical-align:middle}
+  @keyframes s{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+  <header>
+    <div class="name" id="storeName">المتجر</div>
+    <button class="cartbtn" onclick="openCart()">🛒 السلة <span class="count" id="count" style="display:none">0</span></button>
+  </header>
+
+  <div class="wrap">
+    <h2>منتجاتنا</h2>
+    <div class="grid" id="grid"><div class="empty"><span class="spin"></span> جارٍ تحميل المنتجات…</div></div>
+  </div>
+
+  <div class="overlay" id="overlay" onclick="closeCart()"></div>
+  <div class="drawer" id="drawer">
+    <h3>🛒 سلة المشتريات <span onclick="closeCart()" style="cursor:pointer;color:#9ca3af">✕</span></h3>
+    <div class="items" id="cartItems"></div>
+    <div class="foot" id="cartFoot"></div>
+  </div>
+
+<script>
+  const API = location.protocol === "file:" ? "http://localhost:9000" : location.origin;
+  const SUB = location.hostname.split(".")[0];   // اسم المتجر من الدومين
+  const CITIES = {
+    EGP: ["القاهرة","الجيزة","الإسكندرية","المنصورة","طنطا","الزقازيق","أسيوط","المنيا","سوهاج","بورسعيد","السويس","الفيوم","دمياط","الغردقة","أسوان"],
+    SAR: ["الرياض","جدة","مكة المكرمة","المدينة المنورة","الدمام","الخبر","الطائف","تبوك","أبها","بريدة","حائل","خميس مشيط","نجران","جازان","ينبع"],
+    SDG: ["الخرطوم","أم درمان","بحري","بورتسودان","كسلا","الأبيض","نيالا","ود مدني"],
+    default: []
+  };
+  let CUR = "";
+  let PRODUCTS = [];
+  const cart = {};   // code -> {name, rate, qty}
+
+  function money(v){ return (Number(v)||0).toLocaleString("ar-EG"); }
+
+  async function loadShop(){
+    try{
+      const r = await fetch(API + "/shop/products?store=" + encodeURIComponent(SUB));
+      const data = await r.json();
+      CUR = data.currency || "";
+      document.getElementById("storeName").textContent = data.store || SUB;
+      document.title = data.store || SUB;
+      PRODUCTS = data.items || [];
+      for (const code of Object.keys(cart)) {
+        const product = PRODUCTS.find(row => row.code === code);
+        if (!product || product.out_of_stock) delete cart[code];
+      }
+      updateCount();
+      renderGrid();
+    }catch(e){
+      document.getElementById("grid").innerHTML =
+        '<div class="empty">تعذّر الاتصال بالمتجر.<br>تأكدي أن خدمة المنصة تعمل (المنفذ 9000).</div>';
+    }
+  }
+
+  function renderGrid(){
+    const g = document.getElementById("grid");
+    if(!PRODUCTS.length){ g.innerHTML = '<div class="empty">لا توجد منتجات معروضة بعد.</div>'; return; }
+    g.innerHTML = PRODUCTS.map(p => {
+      const img = p.image ? '<img src="'+p.image+'" alt="">' : '🛍️';
+      const sold = p.out_of_stock ? '<span class="soldout">نفد</span>' : '';
+      const button = p.out_of_stock
+        ? '<button disabled>نفد من المخزون</button>'
+        : '<button onclick="addToCart(\''+p.code.replace(/'/g,"\\'")+'\')">أضف للسلة</button>';
+      return '<div class="prod"><div class="img">'+img+sold+'</div><div class="body">'
+        + '<div class="t">'+p.name+'</div>'
+        + '<div class="d">'+(p.desc||"")+'</div>'
+        + '<div class="price">'+money(p.rate)+' '+CUR+'</div>'
+        + button
+        + '</div></div>';
+    }).join("");
+  }
+
+  function addToCart(code){
+    const p = PRODUCTS.find(x=>x.code===code); if(!p) return;
+    if(p.out_of_stock) return;
+    if(cart[code]) cart[code].qty++;
+    else cart[code] = {name:p.name, rate:p.rate, qty:1};
+    updateCount(); renderCart();
+  }
+  function setQty(code, delta){
+    if(!cart[code]) return;
+    cart[code].qty += delta;
+    if(cart[code].qty<=0) delete cart[code];
+    updateCount(); renderCart();
+  }
+  function updateCount(){
+    const n = Object.values(cart).reduce((a,c)=>a+c.qty,0);
+    const el = document.getElementById("count");
+    el.textContent = n; el.style.display = n? "flex":"none";
+  }
+  function cartTotal(){ return Object.values(cart).reduce((a,c)=>a+c.qty*c.rate,0); }
+
+  function renderCart(){
+    const items = document.getElementById("cartItems");
+    const foot = document.getElementById("cartFoot");
+    const entries = Object.entries(cart);
+    if(!entries.length){
+      items.innerHTML = '<div class="empty">السلة فاضية</div>'; foot.innerHTML=""; return;
+    }
+    items.innerHTML = entries.map(([code,c]) =>
+      '<div class="ci"><div class="ct"><div class="n">'+c.name+'</div>'
+      + '<div class="p">'+money(c.rate)+' '+CUR+'</div></div>'
+      + '<div class="qty"><button onclick="setQty(\''+code.replace(/'/g,"\\'")+'\',-1)">−</button>'
+      + '<span>'+c.qty+'</span>'
+      + '<button onclick="setQty(\''+code.replace(/'/g,"\\'")+'\',1)">+</button></div></div>'
+    ).join("");
+    const cities = (CITIES[CUR] || CITIES.default);
+    const cityOpts = '<option value="">اختاري المدينة</option>' +
+      cities.map(c=>'<option value="'+c+'">'+c+'</option>').join('') + '<option value="أخرى">أخرى</option>';
+    foot.innerHTML =
+      '<div class="total"><span>الإجمالي</span><span>'+money(cartTotal())+' '+CUR+'</span></div>'
+      + '<label>الاسم <span style="color:#ef4444">*</span></label><input id="c_name" placeholder="اسمك">'
+      + '<label>رقم الجوال <span style="color:#ef4444">*</span></label><input id="c_phone" placeholder="01xxxxxxxxx">'
+      + '<label>المدينة <span style="color:#ef4444">*</span></label><select id="c_city">'+cityOpts+'</select>'
+      + '<label>الحي</label><input id="c_district" placeholder="اسم الحي/المنطقة">'
+      + '<label>العنوان بالتفصيل <span style="color:#ef4444">*</span></label>'
+      + '<textarea id="c_addr" rows="2" placeholder="الشارع، رقم المبنى، رقم الشقة"></textarea>'
+      + '<button type="button" class="locbtn" id="locBtn" onclick="getLoc()">📍 حدّدي موقعي على الخريطة</button>'
+      + '<div class="locnote" id="locNote"></div>'
+      + '<label>طريقة الدفع</label>'
+      + '<div class="pays">'
+      +   '<label class="pay selected"><input type="radio" name="pay" value="الدفع عند الاستلام" checked onchange="selPay(this)"> 💵 الدفع عند الاستلام</label>'
+      +   '<label class="pay"><input type="radio" name="pay" value="بطاقة ائتمان / مدى" onchange="selPay(this)"> 💳 بطاقة ائتمان / مدى</label>'
+      +   '<label class="pay"><input type="radio" name="pay" value="محفظة إلكترونية" onchange="selPay(this)"> 📱 محفظة إلكترونية</label>'
+      + '</div>'
+      + '<button class="buy" id="buyBtn" onclick="checkout()">🛍️ إتمام الشراء</button>'
+      + '<div class="msg" id="buyMsg"></div>';
+  }
+  let GEO = {lat:null, lng:null};
+  function selPay(el){ document.querySelectorAll('.pay').forEach(p=>p.classList.remove('selected')); el.closest('.pay').classList.add('selected'); }
+  function getLoc(){
+    const note = document.getElementById("locNote");
+    if(!navigator.geolocation){ note.textContent="المتصفح لا يدعم تحديد الموقع"; return; }
+    note.innerHTML = '<span class="spin"></span> جارٍ تحديد موقعك…';
+    navigator.geolocation.getCurrentPosition(
+      pos => { GEO.lat = pos.coords.latitude.toFixed(6); GEO.lng = pos.coords.longitude.toFixed(6);
+        note.innerHTML = '✅ اتحدّد موقعك — <a href="https://maps.google.com/?q='+GEO.lat+','+GEO.lng+'" target="_blank">شوفيه على الخريطة</a>'; },
+      err => { note.textContent = "تعذّر تحديد الموقع (اسمحي للمتصفح بالوصول للموقع)"; }
+    );
+  }
+
+  const DRAWER_HTML =
+    '<h3>🛒 سلة المشتريات <span onclick="closeCart()" style="cursor:pointer;color:#9ca3af">✕</span></h3>'
+    + '<div class="items" id="cartItems"></div><div class="foot" id="cartFoot"></div>';
+  function resetDrawer(){ document.getElementById("drawer").innerHTML = DRAWER_HTML; renderCart(); }
+
+  let CO = null;   // بيانات الطلب المؤقتة
+
+  function checkout(){
+    const name = (document.getElementById("c_name").value||"").trim();
+    const phone = (document.getElementById("c_phone").value||"").trim();
+    const city = (document.getElementById("c_city").value||"").trim();
+    const district = (document.getElementById("c_district").value||"").trim();
+    const addr = (document.getElementById("c_addr").value||"").trim();
+    const pay = (document.querySelector('input[name="pay"]:checked')||{}).value || "";
+    const msg = document.getElementById("buyMsg");
+    if(name.length<2){ msg.textContent="اكتبي اسمك من فضلك"; return; }
+    if(phone.length<6){ msg.textContent="اكتبي رقم جوال صحيح"; return; }
+    if(!city){ msg.textContent="اختاري المدينة"; return; }
+    if(addr.length<3){ msg.textContent="اكتبي العنوان بالتفصيل"; return; }
+    CO = {name, phone, city, district, addr, pay,
+          items: Object.entries(cart).map(([code,c])=>({code, qty:c.qty, rate:c.rate}))};
+    if(pay.indexOf("الاستلام")>=0){                 // الدفع عند الاستلام → مباشرة
+      const btn=document.getElementById("buyBtn"); btn.disabled=true; btn.innerHTML='<span class="spin"></span> جارٍ إتمام الطلب…';
+      placeOrder(pay);
+    } else {                                          // بطاقة / محفظة → شاشة دفع تجريبية
+      showPayScreen(pay);
+    }
+  }
+
+  function showPayScreen(method){
+    const isCard = method.indexOf("بطاقة")>=0;
+    const amount = CO.items.reduce((a,i)=>a+i.qty*i.rate,0);
+    document.getElementById("drawer").innerHTML =
+      '<h3>'+(isCard?'💳':'📱')+' الدفع <span onclick="resetDrawer()" style="cursor:pointer;color:#9ca3af">✕</span></h3>'
+      + '<div style="padding:18px">'
+      + '<div class="testbanner">🧪 وضع تجريبي — مش بيخصم فلوس حقيقية. اكتبي أي أرقام.</div>'
+      + '<div class="total" style="margin:16px 0"><span>المطلوب دفعه</span><span>'+money(amount)+' '+CUR+'</span></div>'
+      + (isCard
+          ? '<label>رقم البطاقة</label><input id="p_card" placeholder="4242 4242 4242 4242" inputmode="numeric">'
+            +'<div style="display:flex;gap:10px"><div style="flex:1"><label>الانتهاء</label><input id="p_exp" placeholder="MM/YY"></div>'
+            +'<div style="flex:1"><label>CVV</label><input id="p_cvv" placeholder="123" inputmode="numeric"></div></div>'
+          : '<label>رقم المحفظة / الجوال</label><input id="p_wallet" placeholder="01xxxxxxxxx" inputmode="numeric">'
+            +'<label>رمز التأكيد (OTP)</label><input id="p_otp" placeholder="أي 6 أرقام" inputmode="numeric">')
+      + '<button class="buy" id="payBtn" onclick="doPay(\''+method.replace(/'/g,"\\'")+'\')">🔒 ادفعي الآن</button>'
+      + '<button class="locbtn" style="margin-top:8px" onclick="resetDrawer()">⟵ رجوع للسلة</button>'
+      + '<div class="msg" id="payMsg" style="text-align:center"></div>'
+      + '</div>';
+  }
+
+  function doPay(method){
+    const btn=document.getElementById("payBtn"); btn.disabled=true;
+    btn.innerHTML='<span class="spin"></span> جارٍ تنفيذ الدفع…';
+    setTimeout(()=> placeOrder(method + " ✅ مدفوع (وضع تجريبي)"), 1300);
+  }
+
+  async function placeOrder(paymentLabel){
+    try{
+      const r = await fetch(API + "/shop/order?store=" + encodeURIComponent(SUB), {
+        method:"POST", headers:{"Content-Type":"application/json"},
+        body: JSON.stringify({customer_name:CO.name, phone:CO.phone, city:CO.city, district:CO.district,
+                              address:CO.addr, payment:paymentLabel, lat:GEO.lat, lng:GEO.lng, items:CO.items})
+      });
+      const d = await r.json();
+      if(!r.ok){ resetDrawer(); const m=document.getElementById("buyMsg"); if(m) m.textContent = d.detail || "تعذّر إتمام الطلب"; return; }
+      const paid = paymentLabel.indexOf("مدفوع")>=0;
+      document.getElementById("drawer").innerHTML =
+        '<div class="done"><div class="ic">✅</div>'
+        + '<div class="ok">'+(paid?'تم الدفع وتأكيد طلبك!':'تم طلبك بنجاح!')+'</div>'
+        + '<div>رقم الطلب: <b>'+d.order+'</b></div>'
+        + '<div style="margin:10px 0">الإجمالي: <b>'+money(d.total)+' '+(d.currency||CUR)+'</b></div>'
+        + '<div style="color:#6b7280;font-size:13px">'+(paid?'الدفع تجريبي — لتفعيل الدفع الحقيقي يلزم حساب بوابة دفع.':'هنتواصل معاكي على جوالك لتأكيد التوصيل.')+'</div>'
+        + '<button class="buy" style="margin-top:20px" onclick="location.reload()">تسوّقي تاني</button></div>';
+      for(const k in cart) delete cart[k]; updateCount();
+    }catch(e){
+      resetDrawer(); const m=document.getElementById("buyMsg"); if(m) m.textContent="تعذّر الاتصال بالخادم";
+    }
+  }
+
+  function openCart(){ resetDrawer(); document.getElementById("overlay").classList.add("show"); document.getElementById("drawer").classList.add("show"); }
+  function closeCart(){ document.getElementById("overlay").classList.remove("show"); document.getElementById("drawer").classList.remove("show"); }
+
+  loadShop();
+</script>
+</body>
+</html>

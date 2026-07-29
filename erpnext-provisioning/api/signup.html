@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>دكاني - إنشاء حساب</title>
+<style>
+  :root{
+    --screen:#f7f7f7;
+    --surface:#fff;
+    --text:#111;
+    --secondary:#757575;
+    --placeholder:#9e9e9e;
+    --border:#e0e0e0;
+    --danger:#d92d20;
+    --danger-bg:#fef2f2;
+    --danger-border:#fecaca;
+    --info-bg:#eff6ff;
+    --info-border:#bfdbfe;
+    --info:#2563eb;
+    --success:#12b76a;
+    --radius:8px;
+    --control:48px;
+    --font:"Cairo","Segoe UI",Tahoma,"Noto Sans Arabic",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    min-height:100vh;
+    background:var(--screen);
+    color:var(--text);
+    font-family:var(--font);
+    -webkit-font-smoothing:antialiased;
+  }
+  button,input,select{font:inherit}
+  .page{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    background:var(--screen);
+  }
+  .header{
+    height:56px;
+    flex:none;
+    position:sticky;
+    top:0;
+    z-index:5;
+    display:grid;
+    grid-template-columns:56px 1fr 56px;
+    align-items:center;
+    border-bottom:1px solid var(--border);
+    background:var(--screen);
+    padding-inline:0;
+  }
+  .header-title{
+    grid-column:2;
+    text-align:center;
+    font-size:18px;
+    line-height:28px;
+    font-weight:700;
+  }
+  .back{
+    grid-column:1;
+    width:48px;
+    height:48px;
+    margin-inline-start:4px;
+    border:0;
+    background:transparent;
+    display:grid;
+    place-items:center;
+    cursor:pointer;
+    color:var(--text);
+  }
+  .back svg{width:20px;height:20px}
+  .content{
+    width:100%;
+    max-width:430px;
+    margin:0 auto;
+    padding:32px 16px 34px;
+  }
+  .intro{
+    margin:0 0 24px;
+    text-align:center;
+    color:var(--secondary);
+    font-size:14px;
+    line-height:24px;
+    font-weight:400;
+  }
+  .message{
+    display:none;
+    margin-bottom:16px;
+    padding:12px;
+    border-radius:var(--radius);
+    text-align:center;
+    font-size:13px;
+    line-height:22px;
+    font-weight:400;
+  }
+  .message.show{display:block}
+  .message.error{
+    color:var(--danger);
+    background:var(--danger-bg);
+    border:1px solid var(--danger-border);
+  }
+  .message.info{
+    color:var(--info);
+    background:var(--info-bg);
+    border:1px solid var(--info-border);
+  }
+  .field{margin-bottom:16px}
+  label{
+    display:block;
+    margin:0 0 8px;
+    text-align:right;
+    font-size:14px;
+    line-height:24px;
+    font-weight:500;
+    color:var(--text);
+  }
+  .shell{
+    height:var(--control);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:var(--surface);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:0 16px;
+  }
+  .shell:focus-within{border-color:#bdbdbd}
+  input,select{
+    width:100%;
+    min-width:0;
+    height:100%;
+    border:0;
+    outline:0;
+    background:transparent;
+    color:var(--text);
+    font-size:14px;
+    line-height:24px;
+  }
+  input::placeholder{color:var(--placeholder)}
+  input[dir="ltr"]{text-align:left;direction:ltr}
+  .phone-row{
+    display:grid;
+    grid-template-columns:118px minmax(0,1fr);
+    gap:8px;
+    direction:ltr;
+  }
+  .country-select{
+    appearance:none;
+    direction:ltr;
+    text-align:left;
+    background:transparent;
+    cursor:pointer;
+  }
+  .select-shell{
+    position:relative;
+    padding-inline:12px 30px;
+  }
+  .select-shell::after{
+    content:"";
+    position:absolute;
+    right:12px;
+    top:50%;
+    width:8px;
+    height:8px;
+    border-inline-end:1.7px solid var(--secondary);
+    border-block-end:1.7px solid var(--secondary);
+    transform:translateY(-65%) rotate(45deg);
+    pointer-events:none;
+  }
+  .domain-shell{
+    direction:ltr;
+  }
+  .domain-suffix{
+    color:var(--secondary);
+    font-size:13px;
+    line-height:22px;
+    white-space:nowrap;
+  }
+  .password-toggle{
+    width:24px;
+    height:24px;
+    flex:none;
+    border:0;
+    padding:0;
+    margin:0;
+    display:grid;
+    place-items:center;
+    background:transparent;
+    color:var(--placeholder);
+    cursor:pointer;
+  }
+  .password-toggle svg{width:22px;height:22px}
+  .country-summary{
+    height:var(--control);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 16px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--surface);
+    font-size:14px;
+    line-height:24px;
+  }
+  .country-summary span:last-child{
+    color:var(--secondary);
+    font-size:13px;
+    line-height:22px;
+  }
+  .primary{
+    width:100%;
+    height:var(--control);
+    border:0;
+    border-radius:var(--radius);
+    background:var(--text);
+    color:#fff;
+    font-size:16px;
+    line-height:26px;
+    font-weight:700;
+    cursor:pointer;
+  }
+  .primary:disabled{
+    cursor:progress;
+    opacity:.18;
+  }
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    color:var(--placeholder);
+    font-size:13px;
+    line-height:22px;
+    margin:16px 0;
+  }
+  .divider::before,.divider::after{
+    content:"";
+    height:1px;
+    flex:1;
+    background:var(--border);
+  }
+  .socials{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:16px;
+  }
+  .social{
+    height:48px;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    background:var(--surface);
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    font-size:14px;
+    line-height:24px;
+    font-weight:500;
+    cursor:pointer;
+  }
+  .social svg{width:20px;height:20px;flex:none}
+  .login-link{
+    margin-top:32px;
+    text-align:center;
+    color:var(--secondary);
+    font-size:13px;
+    line-height:22px;
+  }
+  .login-link a{
+    color:var(--text);
+    font-size:13px;
+    line-height:22px;
+    font-weight:700;
+    text-decoration:none;
+  }
+  .done{
+    padding-top:80px;
+    text-align:center;
+  }
+  .check{
+    width:72px;
+    height:72px;
+    margin:0 auto 24px;
+    border-radius:50%;
+    background:var(--success);
+    display:grid;
+    place-items:center;
+    color:#fff;
+  }
+  .check svg{width:36px;height:36px}
+  .done h1{
+    margin:0 0 8px;
+    font-size:24px;
+    line-height:38px;
+    font-weight:700;
+  }
+  .done p{
+    margin:0 0 32px;
+    color:var(--secondary);
+    font-size:14px;
+    line-height:24px;
+  }
+  .hidden{display:none!important}
+  .spinner{
+    width:16px;
+    height:16px;
+    display:inline-block;
+    vertical-align:-3px;
+    margin-inline-start:6px;
+    border:2px solid rgba(255,255,255,.35);
+    border-top-color:#fff;
+    border-radius:50%;
+    animation:spin .8s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg)}}
+  @media (min-width:760px){
+    body{background:var(--screen)}
+    .page{
+      max-width:430px;
+      min-height:calc(100vh - 48px);
+      margin:24px auto;
+      border:1px solid var(--border);
+      border-radius:30px;
+      overflow:hidden;
+      box-shadow:0 12px 36px rgba(0,0,0,.08);
+    }
+    .header{position:relative}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .spinner{animation:none}
+  }
+</style>
+</head>
+<body>
+  <main class="page">
+    <header class="header">
+      <button class="back" type="button" id="backBtn" aria-label="رجوع">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M9 18l6-6-6-6"></path>
+        </svg>
+      </button>
+      <div class="header-title" id="headerTitle">إنشاء حساب</div>
+    </header>
+
+    <section class="content">
+      <p class="intro" id="intro">أنشئ حسابك وابدأ رحلتك مع دكاني</p>
+      <div class="message" id="message"></div>
+
+      <form id="accountForm" novalidate>
+        <div class="field">
+          <label for="fullName">الاسم الكامل</label>
+          <div class="shell">
+            <input id="fullName" autocomplete="name" autocorrect="off" spellcheck="false" placeholder="أدخل اسمك">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="email">البريد الإلكتروني</label>
+          <div class="shell">
+            <input id="email" dir="ltr" type="email" autocomplete="email" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="example@email.com">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="phone">رقم الجوال</label>
+          <div class="phone-row">
+            <div class="shell select-shell">
+              <select id="countryCode" class="country-select" aria-label="كود الدولة">
+                <option value="966">🇸🇦 +966</option>
+                <option value="20">🇪🇬 +20</option>
+                <option value="249">🇸🇩 +249</option>
+              </select>
+            </div>
+            <div class="shell">
+              <input id="phone" dir="ltr" inputmode="numeric" autocomplete="tel-national" autocorrect="off" spellcheck="false" placeholder="5xxxxxxxx">
+            </div>
+          </div>
+        </div>
+
+        <button class="primary" type="submit" id="accountBtn">إنشاء حساب</button>
+
+        <div class="divider">أو</div>
+        <div class="socials">
+          <button class="social" type="button" data-soon>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.38-1.04 2.55-2.2 3.34v2.76h3.56c2.08-1.92 3.28-4.74 3.28-8.11z"></path>
+              <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.64l-3.56-2.76c-.98.66-2.23 1.05-3.72 1.05-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84A11 11 0 0 0 12 23z"></path>
+              <path fill="#FBBC05" d="M5.84 14.12a6.59 6.59 0 0 1 0-4.24V7.04H2.18a11 11 0 0 0 0 9.92l3.66-2.84z"></path>
+              <path fill="#EA4335" d="M12 5.35c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.08 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.04l3.66 2.84C6.71 7.28 9.14 5.35 12 5.35z"></path>
+            </svg>
+            جوجل
+          </button>
+          <button class="social" type="button" data-soon>
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M16.36 1.43c0 1.09-.4 2.08-1.2 2.97-.97 1.06-2.09 1.67-3.3 1.57a4.2 4.2 0 0 1 1.22-3.08c.89-.98 2.25-1.73 3.28-1.46zM20.8 17.42c-.43.99-.64 1.43-1.2 2.3-.78 1.2-1.89 2.7-3.26 2.71-1.22.01-1.53-.79-3.18-.78-1.65.01-2 .8-3.22.79-1.37-.02-2.42-1.36-3.2-2.56-2.19-3.36-2.42-7.31-1.07-9.4.95-1.49 2.46-2.36 3.88-2.36 1.44 0 2.35.8 3.55.8 1.16 0 1.87-.8 3.55-.8 1.27 0 2.62.69 3.57 1.89-3.14 1.72-2.63 6.21.58 7.41z"></path>
+            </svg>
+            آبل
+          </button>
+        </div>
+        <div class="login-link">لديك حساب بالفعل؟ <a href="/login">تسجيل الدخول</a></div>
+      </form>
+
+      <form id="storeForm" class="hidden" novalidate>
+        <div class="field">
+          <label for="storeName">اسم المتجر</label>
+          <div class="shell">
+            <input id="storeName" autocomplete="organization" autocorrect="off" spellcheck="false" placeholder="متجر نور للعطور">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="subdomain">النطاق الفرعي</label>
+          <div class="shell domain-shell">
+            <span class="domain-suffix">.dukani.ai</span>
+            <input id="subdomain" dir="ltr" inputmode="latin" autocomplete="off" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="noor">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="password">كلمة المرور</label>
+          <div class="shell" dir="ltr">
+            <button class="password-toggle" type="button" id="togglePassword" aria-label="إظهار كلمة المرور">
+              <svg id="eyeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M3 3l18 18"></path>
+                <path d="M10.58 10.58A2 2 0 0 0 13.42 13.4"></path>
+                <path d="M9.88 4.24A10.7 10.7 0 0 1 12 4c5 0 9 4 10 8a11.77 11.77 0 0 1-2.8 4.65"></path>
+                <path d="M6.61 6.61A11.75 11.75 0 0 0 2 12c1 4 5 8 10 8 1.9 0 3.67-.58 5.14-1.57"></path>
+              </svg>
+            </button>
+            <input id="password" dir="ltr" type="password" autocomplete="new-password" autocorrect="off" autocapitalize="none" spellcheck="false" placeholder="6 أحرف على الأقل">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="country-summary">
+            <span id="countryName">السعودية</span>
+            <span id="currency">SAR</span>
+          </div>
+        </div>
+
+        <button class="primary" type="submit" id="storeBtn">تجهيز المتجر</button>
+      </form>
+
+      <section id="done" class="done hidden">
+        <div class="check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M20 6 9 17l-5-5"></path>
+          </svg>
+        </div>
+        <h1>متجرك جاهز</h1>
+        <p id="doneText"></p>
+        <button class="primary" type="button" id="loginBtn">تسجيل الدخول</button>
+      </section>
+    </section>
+  </main>
+
+<script>
+  const API = location.hostname === "localhost" || location.protocol === "file:"
+    ? "http://localhost:9000"
+    : "https://dukani.ai";
+  const countries = {
+    "966": {country:"Saudi Arabia", arabic:"السعودية", currency:"SAR", hint:"5xxxxxxxx", min:8},
+    "20": {country:"Egypt", arabic:"مصر", currency:"EGP", hint:"1xxxxxxxxx", min:10},
+    "249": {country:"Sudan", arabic:"السودان", currency:"SDG", hint:"9xxxxxxxx", min:8}
+  };
+  const state = {
+    step: 0,
+    loading: false,
+    countryCode: "966",
+    email: "",
+    fullName: "",
+    loginUrl: "/login",
+    poll: null
+  };
+
+  const $ = id => document.getElementById(id);
+  const accountForm = $("accountForm");
+  const storeForm = $("storeForm");
+  const done = $("done");
+  const message = $("message");
+
+  function setStep(step){
+    state.step = step;
+    $("headerTitle").textContent = step === 0 ? "إنشاء حساب" : "إعداد المتجر";
+    $("intro").textContent = step === 0 ? "أنشئ حسابك وابدأ رحلتك مع دكاني" : "اختار بيانات متجرك على ERPNext";
+    $("intro").classList.toggle("hidden", step === 2);
+    accountForm.classList.toggle("hidden", step !== 0);
+    storeForm.classList.toggle("hidden", step !== 1);
+    done.classList.toggle("hidden", step !== 2);
+    clearMessage();
+  }
+
+  function setLoading(loading, button, normalText, loadingText){
+    state.loading = loading;
+    button.disabled = loading;
+    button.innerHTML = loading ? loadingText + ' <span class="spinner"></span>' : normalText;
+    accountForm.querySelectorAll("input,select,button").forEach(el => {
+      if (el !== button && !el.hasAttribute("data-soon")) el.disabled = loading;
+    });
+    storeForm.querySelectorAll("input,button").forEach(el => {
+      if (el !== button && el.id !== "togglePassword") el.disabled = loading;
+    });
+    $("backBtn").disabled = loading;
+  }
+
+  function showMessage(text, error=false){
+    message.className = "message show " + (error ? "error" : "info");
+    message.textContent = text;
+  }
+  function clearMessage(){
+    message.className = "message";
+    message.textContent = "";
+  }
+  function apiError(data, fallback){
+    const detail = data && data.detail;
+    if (Array.isArray(detail)) return detail.map(item => item.msg || item).join("، ");
+    if (typeof detail === "string" && detail.trim()) return detail;
+    return fallback;
+  }
+  function suggestSubdomain(email, name){
+    const source = (email.split("@")[0] || name || "store").toLowerCase();
+    const cleaned = source.replace(/[^a-z0-9-]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    if (cleaned.length < 3) return "store";
+    return cleaned.slice(0, 24);
+  }
+  function normalizeDigits(value){
+    return value.replace(/[^\d]/g, "");
+  }
+  function validatePhone(phone){
+    const c = countries[state.countryCode];
+    if (!phone || phone.length < c.min) return "رقم جوال غير صالح";
+    return null;
+  }
+  function currentCountry(){
+    return countries[state.countryCode] || countries["966"];
+  }
+  function refreshCountry(){
+    const c = currentCountry();
+    $("phone").placeholder = c.hint;
+    $("countryName").textContent = c.arabic;
+    $("currency").textContent = c.currency;
+  }
+
+  $("countryCode").addEventListener("change", event => {
+    state.countryCode = event.target.value;
+    refreshCountry();
+  });
+  $("phone").addEventListener("input", event => {
+    event.target.value = normalizeDigits(event.target.value);
+  });
+  $("subdomain").addEventListener("input", event => {
+    event.target.value = event.target.value.toLowerCase().replace(/[^a-z0-9-]/g, "");
+  });
+  document.querySelectorAll("[data-soon]").forEach(btn => {
+    btn.addEventListener("click", () => showMessage("تسجيل جوجل وآبل هيتفعل لاحقاً في مرحلة الربط."));
+  });
+
+  accountForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    clearInterval(state.poll);
+    const fullName = $("fullName").value.trim();
+    const email = $("email").value.trim();
+    const phone = normalizeDigits($("phone").value);
+    if (fullName.length < 2) return showMessage("يرجى إدخال الاسم الكامل", true);
+    if (!email.includes("@")) return showMessage("بريد إلكتروني غير صالح", true);
+    if (email.toLowerCase().endsWith("@gamil.com")) {
+      return showMessage("هل تقصد gmail.com؟ صحح البريد الإلكتروني أولاً", true);
+    }
+    const phoneError = validatePhone(phone);
+    if (phoneError) return showMessage(phoneError, true);
+
+    setLoading(true, $("accountBtn"), "إنشاء حساب", "جارٍ إنشاء الحساب...");
+    try {
+      const res = await fetch(API + "/register", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          full_name: fullName,
+          email,
+          phone,
+          country_code: state.countryCode
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok && res.status !== 409) {
+        showMessage(apiError(data, "تعذر إنشاء الحساب"), true);
+        return;
+      }
+      state.fullName = fullName;
+      state.email = email;
+      $("storeName").value = $("storeName").value.trim() || fullName;
+      $("subdomain").value = $("subdomain").value.trim() || suggestSubdomain(email, fullName);
+      setStep(1);
+      if (res.status === 409) showMessage("الحساب موجود بالفعل، كمل إعداد المتجر");
+    } catch(err) {
+      showMessage("فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت", true);
+    } finally {
+      setLoading(false, $("accountBtn"), "إنشاء حساب", "جارٍ إنشاء الحساب...");
+    }
+  });
+
+  storeForm.addEventListener("submit", async event => {
+    event.preventDefault();
+    const merchantName = $("storeName").value.trim();
+    const subdomain = $("subdomain").value.trim().toLowerCase();
+    const password = $("password").value;
+    if (merchantName.length < 2) return showMessage("اسم المتجر قصير جداً", true);
+    if (!/^[a-z0-9][a-z0-9-]{1,30}[a-z0-9]$/.test(subdomain)) {
+      return showMessage("النطاق يجب أن يكون إنجليزي صغير وأرقام و - فقط", true);
+    }
+    if (password.length < 6) return showMessage("كلمة المرور 6 أحرف على الأقل", true);
+
+    setLoading(true, $("storeBtn"), "تجهيز المتجر", "جارٍ التجهيز...");
+    showMessage("جارٍ إرسال طلب تجهيز المتجر...");
+    try {
+      const res = await fetch(API + "/tenants", {
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify({
+          subdomain,
+          merchant_name: merchantName,
+          email: state.email || $("email").value.trim(),
+          password,
+          country: currentCountry().country
+        })
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        showMessage(apiError(data, "تعذر تجهيز المتجر"), true);
+        setLoading(false, $("storeBtn"), "تجهيز المتجر", "جارٍ التجهيز...");
+        return;
+      }
+      showMessage("بدأ تجهيز متجرك على ERPNext... قد يستغرق من دقيقة إلى دقيقتين");
+      pollStatus(data.subdomain || subdomain);
+    } catch(err) {
+      showMessage("فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت", true);
+      setLoading(false, $("storeBtn"), "تجهيز المتجر", "جارٍ التجهيز...");
+    }
+  });
+
+  async function pollStatus(subdomain){
+    clearInterval(state.poll);
+    await checkTenantStatus(subdomain);
+    state.poll = setInterval(() => checkTenantStatus(subdomain), 4000);
+  }
+  async function checkTenantStatus(subdomain){
+    try {
+      const res = await fetch(API + "/tenants/" + encodeURIComponent(subdomain));
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) return;
+      if (data.status === "ready") {
+        clearInterval(state.poll);
+        state.loginUrl = "/login?email=" + encodeURIComponent(state.email || $("email").value.trim());
+        $("doneText").textContent = "استخدم البريد " + (state.email || $("email").value.trim()) + " وكلمة المرور التي أدخلتها لتسجيل الدخول.";
+        setLoading(false, $("storeBtn"), "تجهيز المتجر", "جارٍ التجهيز...");
+        setStep(2);
+      } else if (data.status === "failed") {
+        clearInterval(state.poll);
+        setLoading(false, $("storeBtn"), "تجهيز المتجر", "جارٍ التجهيز...");
+        showMessage(data.error || "فشل تجهيز المتجر", true);
+      } else if (data.status === "pending") {
+        showMessage("طلب التجهيز في الانتظار...");
+      } else if (data.status === "provisioning") {
+        showMessage("جارٍ إنشاء المتجر وتطبيق قالب دكاني... قد يستغرق من دقيقة إلى دقيقتين");
+      } else {
+        showMessage("الحالة: " + (data.status || "غير معروفة") + "...");
+      }
+    } catch(err) {
+      showMessage("فشل الاتصال بالخادم، تأكد من اتصالك بالإنترنت", true);
+    }
+  }
+
+  $("togglePassword").addEventListener("click", () => {
+    const input = $("password");
+    input.type = input.type === "password" ? "text" : "password";
+  });
+  $("loginBtn").addEventListener("click", () => {
+    window.location.href = state.loginUrl;
+  });
+  $("backBtn").addEventListener("click", () => {
+    if (state.loading) return;
+    if (state.step === 1) {
+      setStep(0);
+      return;
+    }
+    if (history.length > 1) history.back();
+    else window.location.href = "/login";
+  });
+
+  refreshCountry();
+</script>
+</body>
+</html>
