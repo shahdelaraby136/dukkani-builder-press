@@ -383,11 +383,10 @@ class Handler(BaseHTTPRequestHandler):
                 )
             payload = urlencode({"usr": email, "pwd": password}).encode("utf-8")
             request = Request(
-                "http://127.0.0.1:8090/api/method/login",
+                f"{pv.PUBLIC_SCHEME}://{self._host()}/api/method/login",
                 data=payload,
                 method="POST",
                 headers={
-                    "Host": self._host(),
                     "X-Forwarded-Proto": "https",
                     "X-Forwarded-For": self.client_address[0],
                     "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8",
