@@ -58,10 +58,11 @@ assert status == 200, f"landing page failed: {status}"
 assert "<title>دكاني —" in landing_html, "root is not serving the Dukkani landing page"
 assert 'href="/login"' in landing_html, "landing page merchant login link is missing"
 
-status, merchant_access_html = fetch("/merchant-access")
-assert status == 200, f"merchant access page failed: {status}"
-assert "form-login" in merchant_access_html, "legacy merchant access does not lead to unified login"
-assert "dukkani-unified-merchant-login" in merchant_access_html, "unified merchant login bridge is missing"
+status, merchant_access_location = fetch_redirect("/merchant-access")
+assert status == 302, f"legacy merchant access did not redirect: {status}"
+assert merchant_access_location.endswith(
+    "/login"
+), f"legacy merchant access target is incorrect: {merchant_access_location}"
 
 status, unified_login_html = fetch("/login")
 assert status == 200, f"unified merchant login failed: {status}"
