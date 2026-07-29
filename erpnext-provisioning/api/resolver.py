@@ -1,10 +1,12 @@
 """Resolve a merchant email to the subdomain of its real Frappe site."""
 import json
 import subprocess
+from pathlib import Path
 
 
 SITES_DIR = "sites"
 CONTAINER = "dukkani-backend-1"
+TENANTS_FILE = Path(__file__).resolve().parent / "tenants.json"
 _QUERY = (
     "SELECT u.name FROM tabUser u "
     "JOIN `tabHas Role` r ON r.parent = u.name "
@@ -64,9 +66,33 @@ def build_index():
     return index
 
 
+def _resolve_from_registry(email):
+    """Resolve completed mobile signups from the provisioning registry."""
+    try:
+        tenants = json.loads(TENANTS_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+
+    normalized = email.strip().lower()
+    records = tenants.values() if isinstance(tenants, dict) else tenants
+    for record in records:
+        if not isinstance(record, dict):
+            continue
+        if record.get("status") != "ready":
+            continue
+        if str(record.get("email", "")).strip().lower() != normalized:
+            continue
+        subdomain = str(record.get("subdomain", "")).strip().lower()
+        if subdomain:
+            return subdomain
+    return None
+
+
 def resolve(email):
     """Return only the merchant subdomain, or None when the email is unknown."""
     if not email:
         return None
     site_name = build_index().get(email.strip().lower())
-    return site_name.split(".")[0] if site_name else None
+    if site_name:
+        return site_name.split(".")[0]
+    return _resolve_from_registry(email)
