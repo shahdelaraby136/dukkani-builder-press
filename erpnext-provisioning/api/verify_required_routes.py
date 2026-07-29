@@ -1,6 +1,7 @@
 """Fail deployment checks when login/signup/landing contracts disappear."""
 import inspect
 from pathlib import Path
+import provisioner
 import server
 import shopapi
 
@@ -51,6 +52,16 @@ if missing_customer_guards:
     raise SystemExit(
         "Customer login can accept merchant identities: "
         + ", ".join(missing_customer_guards)
+    )
+
+provision_source = inspect.getsource(provisioner.provision)
+if "_ensure_press_site" not in provision_source:
+    raise SystemExit("New mobile stores are not created through Press")
+if "_register_existing_press_site" not in provision_source:
+    raise SystemExit("Resumed stores are not registered in Press")
+if provisioner.CONTAINER != provisioner.PRESS_BENCH:
+    raise SystemExit(
+        "Provisioning container and active Press bench must stay aligned"
     )
 
 api_dir = Path(server.__file__).resolve().parent

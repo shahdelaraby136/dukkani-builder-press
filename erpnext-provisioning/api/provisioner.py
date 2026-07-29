@@ -29,10 +29,16 @@ EMAIL_SOURCE_SITE = os.environ.get("DUKKANI_EMAIL_SOURCE_SITE", "kareem.dukani.a
 EMAIL_ACCOUNT_NAME = os.environ.get("DUKKANI_EMAIL_ACCOUNT_NAME", "Dukkani Gmail").strip()
 
 # إعدادات ستاك Dukkani على Docker
-CONTAINER = "bench-0001-000006-dukkanip"
+CONTAINER = os.environ.get(
+    "DUKKANI_BENCH_CONTAINER",
+    "bench-0001-000007-dukkanip",
+).strip()
 PRESS_CONTAINER = "press-backend-1"
 PRESS_SITE = "press.dukani.ai"
-PRESS_BENCH = "bench-0001-000006-dukkanip"
+PRESS_BENCH = os.environ.get(
+    "DUKKANI_PRESS_BENCH",
+    "bench-0001-000007-dukkanip",
+).strip()
 PRESS_PLAN = "Dukkani Internal Site"
 PORT = 8090                         # المنفذ اللي عليه الـ frontend
 BASE_DOMAIN = os.environ.get("DUKKANI_BASE_DOMAIN", "localhost").strip().lower()
@@ -245,7 +251,10 @@ else:
 """
     result = _press_console(code, timeout=180)
     output = (result.stdout or "") + (result.stderr or "")
-    if result.returncode != 0 or "DUKKANI_PRESS_" not in output:
+    site_marker = re.compile(
+        rf"DUKKANI_PRESS_(?:CREATED|EXISTS)\s+{re.escape(site)}(?:\s|$)"
+    )
+    if result.returncode != 0 or not site_marker.search(output):
         raise RuntimeError("Press registration failed: " + _tail(output, lines=40))
 
     deadline = time.monotonic() + 1200
@@ -282,8 +291,78 @@ print("DUKKANI_PRESS_ACTIVE", site_name)
 """
     synced = _press_console(sync_code, timeout=180)
     sync_output = (synced.stdout or "") + (synced.stderr or "")
-    if synced.returncode != 0 or "DUKKANI_PRESS_ACTIVE" not in sync_output:
+    active_marker = re.compile(
+        rf"DUKKANI_PRESS_ACTIVE\s+{re.escape(site)}(?:\s|$)"
+    )
+    if synced.returncode != 0 or not active_marker.search(sync_output):
         raise RuntimeError("Press status sync failed: " + _tail(sync_output, lines=40))
+
+
+def _register_existing_press_site(
+    subdomain: str,
+    site: str,
+    admin_password: str,
+) -> None:
+    """Register an existing Frappe site in Press without recreating it.
+
+    A previous or resumed provisioning attempt can leave the physical site in
+    place before Press receives its Site document.  Inserting a normal Press
+    Site would enqueue a destructive duplicate ``new_site`` Agent job.  This
+    bridge skips only Press's ``after_insert`` provisioning hook, while still
+    running validation and inserting the app child records.
+    """
+    code = f"""
+import frappe
+from press.press.doctype.site.site import Site
+
+site_name = {site!r}
+if frappe.db.exists("Site", site_name):
+    doc = frappe.get_doc("Site", site_name)
+    print("DUKKANI_PRESS_EXISTS", doc.name, doc.status)
+else:
+    bench = frappe.get_doc("Bench", {PRESS_BENCH!r})
+    doc = frappe.get_doc({{
+        "doctype": "Site",
+        "subdomain": {subdomain!r},
+        "domain": {BASE_DOMAIN!r},
+        "status": "Active",
+        "server": bench.server,
+        "bench": bench.name,
+        "group": bench.group,
+        "cluster": bench.cluster,
+        "team": bench.team,
+        "plan": {PRESS_PLAN!r},
+        "free": 1,
+        "admin_password": {admin_password!r},
+        "apps": [
+            {{"app": "frappe"}},
+            {{"app": "erpnext"}},
+            {{"app": "builder"}},
+        ],
+    }})
+    original_after_insert = Site.after_insert
+    original_on_update = Site.on_update
+    Site.after_insert = lambda self: None
+    Site.on_update = lambda self: None
+    try:
+        doc.insert(ignore_permissions=True)
+    finally:
+        Site.after_insert = original_after_insert
+        Site.on_update = original_on_update
+    doc._create_default_site_domain()
+    frappe.db.commit()
+    print("DUKKANI_PRESS_REGISTERED", doc.name, doc.status)
+"""
+    result = _press_console(code, timeout=180)
+    output = (result.stdout or "") + (result.stderr or "")
+    site_marker = re.compile(
+        rf"DUKKANI_PRESS_(?:REGISTERED|EXISTS)\s+{re.escape(site)}(?:\s|$)"
+    )
+    if result.returncode != 0 or not site_marker.search(output):
+        raise RuntimeError(
+            "Existing Press Site registration failed: "
+            + _tail(output, lines=40)
+        )
 
 
 def _fast_template(country: str) -> str | None:
@@ -541,6 +620,18 @@ def provision(subdomain: str, merchant_name: str,
                 fast_path=False,
             )
             _ensure_press_site(subdomain, site, password or ADMIN_PASS)
+        else:
+            _record_step(
+                subdomain,
+                "registering_existing_press_site",
+                started,
+                fast_path=False,
+            )
+            _register_existing_press_site(
+                subdomain,
+                site,
+                password or ADMIN_PASS,
+            )
 
         if used_fast_template:
             _record_step(subdomain, "personalizing_store", started, fast_path=True)
