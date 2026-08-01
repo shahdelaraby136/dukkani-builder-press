@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field, field_validator
 
 import provisioner as pv
+from api_security import public_tenant, public_tenants
 
 app = FastAPI(
     title="Dukkani Provisioning API",
@@ -22,7 +23,11 @@ app = FastAPI(
 # الأونبوردينج قد يأتي من الموبايل أو الويب على أصول مختلفة
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=(
+        r"https://([a-z0-9-]+\.)*" + re.escape(pv.BASE_DOMAIN)
+        if pv.BASE_DOMAIN != "localhost"
+        else r"https?://(localhost|127\.0\.0\.1)(:\d+)?"
+    ),
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -51,7 +56,7 @@ def health():
 
 @app.get("/tenants")
 def tenants():
-    return pv.list_tenants()
+    return public_tenants(pv.list_tenants())
 
 
 @app.get("/tenants/{subdomain}")
@@ -59,7 +64,7 @@ def tenant_status(subdomain: str):
     record = pv.get_status(subdomain.lower())
     if not record:
         raise HTTPException(404, "التاجر غير موجود")
-    return record
+    return public_tenant(record)
 
 
 @app.post("/tenants", status_code=202)

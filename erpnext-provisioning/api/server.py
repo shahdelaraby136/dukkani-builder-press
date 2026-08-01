@@ -24,6 +24,7 @@ import provisioner as pv
 import resolver
 import shopapi
 import social_auth
+from api_security import allowed_origin, public_tenant, public_tenants
 
 # مزامنة تلقائية للوحة الأدمن كل SYNC_EVERY ثانية
 SYNC_EVERY = 90
@@ -82,9 +83,16 @@ class Handler(BaseHTTPRequestHandler):
         body = json.dumps(payload, ensure_ascii=False).encode("utf-8")
         self.send_response(code)
         self.send_header("Content-Type", "application/json; charset=utf-8")
-        self.send_header("Access-Control-Allow-Origin", "*")
+        origin = allowed_origin(self.headers.get("Origin"), pv.BASE_DOMAIN)
+        if origin:
+            self.send_header("Access-Control-Allow-Origin", origin)
+            self.send_header("Vary", "Origin")
         self.send_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
         self.send_header("Access-Control-Allow-Headers", "Content-Type")
+        self.send_header("Cache-Control", "no-store")
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "SAMEORIGIN")
+        self.send_header("Referrer-Policy", "same-origin")
         self.send_header("Content-Length", str(len(body)))
         self.end_headers()
         self.wfile.write(body)
@@ -245,7 +253,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._redirect(social_auth.google_authorize_url())
             except social_auth.SocialAuthError as exc:
-                return self._send(502, {"detail": str(exc)})
+                return self._send(502, {"detail": "external service unavailable"})
         if request_path in ("/merchant-access", "/merchant-access.html"):
             return self._redirect(
                 f"{pv.PUBLIC_SCHEME}://{pv.BASE_DOMAIN}/login"
@@ -321,7 +329,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 sub = resolver.resolve(email)
             except Exception as exc:                       # noqa: BLE001
-                return self._send(502, {"detail": str(exc)})
+                return self._send(502, {"detail": "request failed"})
             if not sub:
                 return self._send(404, {"detail": "لا يوجد متجر مرتبط بهذا البريد"})
             return self._send(200, {"subdomain": sub})
@@ -334,7 +342,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(200, shopapi.reverse_geocode(lat, lng))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(502, {"detail": str(exc)})
+                return self._send(502, {"detail": "request failed"})
         if request_path.startswith("/shop/products"):        # واجهة المتجر: عرض المنتجات
             store = (parse_qs(urlparse(self.path).query).get("store", [""])[0] or "").lower()
             if not store:
@@ -342,7 +350,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(200, shopapi.list_products(store))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if request_path == "/shop/customer-orders":
             params = parse_qs(urlparse(self.path).query)
             store = (params.get("store", [""])[0] or "").strip().lower()
@@ -352,7 +360,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(200, shopapi.customer_orders(store, email))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if request_path == "/shop/track-order":
             params = parse_qs(urlparse(self.path).query)
             store = (params.get("store", [""])[0] or "").strip().lower()
@@ -363,13 +371,15 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(200, shopapi.track_order(store, order, email))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if request_path == "/tenants":
-            return self._send(200, pv.list_tenants())
+            return self._send(200, public_tenants(pv.list_tenants()))
         if request_path.startswith("/tenants/"):
             sub = request_path.split("/tenants/", 1)[1].strip("/").lower()
             rec = pv.get_status(sub)
-            return self._send(200, rec) if rec else self._send(404, {"detail": "التاجر غير موجود"})
+            if rec:
+                return self._send(200, public_tenant(rec))
+            return self._send(404, {"detail": "التاجر غير موجود"})
         return self._send(404, {"detail": "غير موجود"})
 
     def _read_json(self):
@@ -435,7 +445,7 @@ class Handler(BaseHTTPRequestHandler):
             except (ValueError, json.JSONDecodeError):
                 return self._send(400, {"detail": "JSON غير صالح"})
             except social_auth.SocialAuthError as exc:
-                return self._send(401, {"detail": str(exc)})
+                return self._send(401, {"detail": "authentication failed"})
             except Exception:
                 return self._send(500, {"detail": "تعذّر تسجيل الدخول عبر Google."})
         if request_path == "/auth/apple/exchange":
@@ -450,7 +460,7 @@ class Handler(BaseHTTPRequestHandler):
             except (ValueError, json.JSONDecodeError):
                 return self._send(400, {"detail": "JSON غير صالح"})
             except social_auth.SocialAuthError as exc:
-                return self._send(401, {"detail": str(exc)})
+                return self._send(401, {"detail": "authentication failed"})
             except Exception:
                 return self._send(500, {"detail": "تعذّر تسجيل الدخول عبر Apple."})
         if request_path == "/register":
@@ -472,7 +482,7 @@ class Handler(BaseHTTPRequestHandler):
                     result,
                 )
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if request_path == "/shop/customer-login":
             store = (
                 parse_qs(urlparse(self.path).query).get("store", [""])[0] or ""
@@ -490,7 +500,7 @@ class Handler(BaseHTTPRequestHandler):
                     result,
                 )
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if self.path.startswith("/shop/order"):           # واجهة المتجر: إتمام طلب الزبون
             store = (parse_qs(urlparse(self.path).query).get("store", [""])[0] or "").lower()
             try:
@@ -502,7 +512,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(201, shopapi.place_order(store, data))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if self.path.startswith("/shop/review"):          # واجهة المتجر: تقييم منتج
             store = (parse_qs(urlparse(self.path).query).get("store", [""])[0] or "").lower()
             try:
@@ -514,7 +524,7 @@ class Handler(BaseHTTPRequestHandler):
             try:
                 return self._send(201, shopapi.add_review(store, data))
             except Exception as exc:                       # noqa: BLE001
-                return self._send(500, {"detail": str(exc)})
+                return self._send(500, {"detail": "request failed"})
         if self.path != "/tenants":
             return self._send(404, {"detail": "غير موجود"})
         try:

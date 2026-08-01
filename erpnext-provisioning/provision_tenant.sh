@@ -16,8 +16,8 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 BENCH_DIR="/home/shahd/frappe_docker"
 COMPOSE="docker compose -f pwd.yml"
-DB_ROOT_PASS="admin"
-ADMIN_PASS="admin"
+DB_ROOT_PASS="${DUKKANI_DB_ROOT_PASSWORD:?DUKKANI_DB_ROOT_PASSWORD is required}"
+ADMIN_PASS="${DUKKANI_SITE_ADMIN_PASSWORD:?DUKKANI_SITE_ADMIN_PASSWORD is required}"
 
 SUBDOMAIN="${1:-merchant1}"
 MERCHANT_NAME="${2:-Dukkani Merchant}"
@@ -100,9 +100,9 @@ cat <<EOF
   الرابط         : http://$SITE:8080
   ── دخول التاجر (الشكل النضيف) ──
   المالك         : $MERCHANT_EMAIL
-  الباسورد       : ${MERCHANT_PASSWORD:-<من فورم التسجيل>}
+  الباسورد       : <hidden>
   ── حساب BDC الداخلي للدعم ──
-  Administrator  : $ADMIN_PASS
+  Administrator  : <hidden>
   الشركة         : $MERCHANT_NAME  ($ABBR)
 ============================================================
 EOF

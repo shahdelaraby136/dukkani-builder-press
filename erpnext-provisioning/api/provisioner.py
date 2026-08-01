@@ -7,6 +7,7 @@
 import json
 import os
 import re
+import secrets
 import subprocess
 import threading
 import time
@@ -45,8 +46,6 @@ BASE_DOMAIN = os.environ.get("DUKKANI_BASE_DOMAIN", "localhost").strip().lower()
 PUBLIC_SCHEME = os.environ.get(
     "DUKKANI_PUBLIC_SCHEME", "https" if BASE_DOMAIN != "localhost" else "http"
 )
-DB_ROOT_PASS = "admin"
-ADMIN_PASS = "admin"
 
 # القيم المسموحة والمحجوزة
 SUBDOMAIN_RE = r"^[a-z0-9](?:[a-z0-9-]{1,30}[a-z0-9])$"
@@ -60,6 +59,11 @@ COUNTRY_TEMPLATE = {
     "Saudi Arabia": "saudi-arabia.sql.gz",
     "Sudan": "sudan.sql.gz",
 }
+
+
+def site_admin_password():
+    configured = os.environ.get("DUKKANI_SITE_ADMIN_PASSWORD", "").strip()
+    return configured or secrets.token_urlsafe(32)
 
 
 def _now() -> str:
@@ -619,7 +623,7 @@ def provision(subdomain: str, merchant_name: str,
                 started,
                 fast_path=False,
             )
-            _ensure_press_site(subdomain, site, password or ADMIN_PASS)
+            _ensure_press_site(subdomain, site, site_admin_password())
         else:
             _record_step(
                 subdomain,
@@ -630,7 +634,7 @@ def provision(subdomain: str, merchant_name: str,
             _register_existing_press_site(
                 subdomain,
                 site,
-                password or ADMIN_PASS,
+                site_admin_password(),
             )
 
         if used_fast_template:
