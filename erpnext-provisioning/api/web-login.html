@@ -699,6 +699,24 @@
         errorBox.classList.remove("visible");
       };
 
+      const loginSystemAdministrator = async (password) => {
+        const body = new URLSearchParams({
+          cmd: "login",
+          usr: "Administrator",
+          pwd: password,
+        });
+        const response = await fetch("/api/method/login", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body,
+        });
+        if (!response.ok) {
+          throw new Error("invalid_credentials");
+        }
+        location.assign("/desk");
+      };
+
       const resolveStore = async () => {
         const email = emailInput.value.trim().toLowerCase();
         if (!email) {
@@ -747,6 +765,10 @@
         submitButton.disabled = true;
         submitButton.textContent = "Ø¬Ø§Ø±Ù ØªØ³Ø¬ÙŠÙ„ Ø§Ù„Ø¯Ø®ÙˆÙ„...";
         try {
+          if (emailInput.value.trim().toLowerCase() === "administrator") {
+            await loginSystemAdministrator(password);
+            return;
+          }
           const store = await resolveStore();
           if (!store) return;
           const tenantForm = document.createElement("form");
