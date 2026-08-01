@@ -5,7 +5,7 @@ from pathlib import Path
 
 
 SITES_DIR = "sites"
-CONTAINER = "dukkani-backend-1"
+CONTAINERS = ("dukkani-backend-1", "bench-0001-000007-dukkanip")
 TENANTS_FILE = Path(__file__).resolve().parent / "tenants.json"
 _QUERY = (
     "SELECT u.name FROM tabUser u "
@@ -24,9 +24,9 @@ def _docker(args, timeout=20):
     )
 
 
-def _site_configs():
+def _site_configs(container):
     """Return real tenant site names and database configurations."""
-    result = _docker(["exec", CONTAINER, "python3", "-c", f"""
+    result = _docker(["exec", container, "python3", "-c", f"""
 import json, os
 out = []
 for directory in os.listdir({SITES_DIR!r}):
@@ -47,22 +47,23 @@ print(json.dumps(out))
 def build_index():
     """Read the enabled Website Manager directly from every tenant database."""
     index = {}
-    for site_name, config in _site_configs():
-        database = config.get("db_name")
-        if not database:
-            continue
-        try:
-            result = _docker([
-                "exec", CONTAINER, "mysql", "-h", "db",
-                "-u", config.get("db_user", database),
-                f"-p{config.get('db_password', '')}", database,
-                "-N", "-B", "-e", _QUERY,
-            ])
-        except subprocess.TimeoutExpired:
-            continue
-        email = (result.stdout or "").strip().split("\n")[0].strip()
-        if email:
-            index[email.lower()] = site_name
+    for container in CONTAINERS:
+        for site_name, config in _site_configs(container):
+            database = config.get("db_name")
+            if not database:
+                continue
+            try:
+                result = _docker([
+                    "exec", container, "mysql", "-h", "db",
+                    "-u", config.get("db_user", database),
+                    f"-p{config.get('db_password', '')}", database,
+                    "-N", "-B", "-e", _QUERY,
+                ])
+            except subprocess.TimeoutExpired:
+                continue
+            email = (result.stdout or "").strip().split("\n")[0].strip()
+            if email:
+                index[email.lower()] = site_name
     return index
 
 
