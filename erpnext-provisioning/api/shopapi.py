@@ -373,6 +373,8 @@ elif len(password) < 8:
     result["detail"] = "كلمة المرور يجب أن تكون 8 أحرف على الأقل."
 elif frappe.db.exists("User", email):
     result["detail"] = "هذا البريد مسجل بالفعل؛ يمكنك تسجيل الدخول مباشرة."
+elif frappe.db.exists("User", {"mobile_no": phone}):
+    result["detail"] = "رقم الهاتف مرتبط بحساب آخر."
 else:
     try:
         user = frappe.get_doc({
