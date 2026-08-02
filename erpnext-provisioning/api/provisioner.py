@@ -212,6 +212,31 @@ def _site_exists(site: str) -> bool:
     return r.returncode == 0
 
 
+def installed_apps(site: str) -> set[str]:
+    result = _docker(
+        ["exec", CONTAINER, "bench", "--site", site, "list-apps"],
+        timeout=60,
+    )
+    if result.returncode != 0:
+        return set()
+    return set((result.stdout or "").lower().split())
+
+
+def ensure_app_installed(site: str, app: str, apps: set[str]) -> str:
+    """Install an app only when Press has not already installed it."""
+    if app in apps:
+        return "already installed by Press"
+    result = _docker(
+        ["exec", CONTAINER, "bench", "--site", site, "install-app", app],
+        timeout=1200,
+    )
+    output = (result.stdout or "") + (result.stderr or "")
+    if result.returncode != 0 and "already installed" not in output:
+        raise RuntimeError(_tail(output, lines=40))
+    apps.add(app)
+    return output
+
+
 def _press_console(code: str, timeout: int = 180) -> subprocess.CompletedProcess:
     """Run trusted bridge code inside Press without exposing an HTTP API key."""
     return _docker(
@@ -264,14 +289,10 @@ else:
     deadline = time.monotonic() + 1200
     while time.monotonic() < deadline:
         if _site_exists(site):
-            apps = _docker(
-                ["exec", CONTAINER, "bench", "--site", site, "list-apps"],
-                timeout=60,
-            )
-            installed = set((apps.stdout or "").lower().split())
+            installed = installed_apps(site)
             if {"frappe", "erpnext", "builder"}.issubset(installed):
                 break
-        time.sleep(5)
+        time.sleep(2)
     else:
         raise TimeoutError("Press Site creation did not complete within 20 minutes")
 
@@ -690,16 +711,14 @@ def provision(subdomain: str, merchant_name: str,
             )
             return
 
-        # Install ERPNext as a resumable step. A previous interrupted request
-        # may have created the Frappe site but stopped during ERPNext sync.
-        _record_step(subdomain, "installing_erpnext", started, fast_path=False)
-        install_erpnext = _docker(
-            ["exec", CONTAINER, "bench", "--site", site, "install-app", "erpnext"],
-            timeout=1200,
-        )
-        erpnext_output = (install_erpnext.stdout or "") + (install_erpnext.stderr or "")
-        if install_erpnext.returncode != 0 and "already installed" not in erpnext_output:
-            return set_status(subdomain, status="failed", error=_tail(erpnext_output, lines=40))
+        # Press normally installs all requested apps. Keep the resumable path,
+        # but avoid repeating expensive install commands when it already did.
+        apps = installed_apps(site)
+        _record_step(subdomain, "checking_erpnext", started, fast_path=False)
+        try:
+            ensure_app_installed(site, "erpnext", apps)
+        except RuntimeError as exc:
+            return set_status(subdomain, status="failed", error=str(exc))
 
         # (4) نسخ القالب داخل الحاوية عبر stdin ثم تطبيقه
         _record_step(subdomain, "applying_dukkani_template", started)
@@ -739,15 +758,12 @@ def provision(subdomain: str, merchant_name: str,
 
         # Builder + editable starter storefronts. Each page reads products
         # from this tenant's own ERPNext database at render time.
-        install_builder = _docker(
-            ["exec", CONTAINER, "bench", "--site", site, "install-app", "builder"],
-            timeout=600,
-        )
-        install_output = (install_builder.stdout or "") + (install_builder.stderr or "")
-        if install_builder.returncode != 0 and "already installed" not in install_output:
+        try:
+            ensure_app_installed(site, "builder", apps)
+        except RuntimeError as exc:
             return set_status(subdomain, status="ready",
                               storefront_status="failed",
-                              storefront_error=_tail(install_output),
+                              storefront_error=str(exc),
                               error=None)
 
         migrate = _docker(
