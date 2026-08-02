@@ -56,5 +56,40 @@ class AppInstallationTest(unittest.TestCase):
         self.assertIn("erpnext", apps)
 
 
+class FastTemplateTest(unittest.TestCase):
+    def test_uses_existing_country_template(self):
+        with patch.object(Path, "is_file", return_value=True):
+            template = provisioner._fast_template("Egypt")
+
+        self.assertEqual(template.name, "egypt.sql.gz")
+
+    def test_falls_back_when_country_template_is_missing(self):
+        with patch.object(Path, "is_file", return_value=False):
+            template = provisioner._fast_template("Egypt")
+
+        self.assertIsNone(template)
+
+    def test_fast_restore_imports_migrates_and_resets_admin_password(self):
+        ok = CompletedProcess([], 0, stdout="ok", stderr="")
+        template = Path("egypt.sql.gz")
+
+        with patch.object(provisioner, "_copy_into_container") as copy, patch.object(
+            provisioner, "_docker", side_effect=[ok, ok, ok]
+        ) as docker:
+            provisioner._restore_fast_template(
+                "store.dukani.ai", template, "generated-admin-secret"
+            )
+
+        copy.assert_called_once_with(
+            template, "/tmp/dukkani-fast-template.sql.gz"
+        )
+        commands = [call.args[0] for call in docker.call_args_list]
+        self.assertIn("mariadb", commands[0][-1])
+        self.assertEqual(commands[1][-1], "migrate")
+        self.assertEqual(commands[2][-2:], [
+            "set-admin-password", "generated-admin-secret"
+        ])
+
+
 if __name__ == "__main__":
     unittest.main()

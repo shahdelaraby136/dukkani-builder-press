@@ -24,7 +24,7 @@ JOBS_DIR = Path(__file__).resolve().parent / ".provisioning-jobs"
 TRAEFIK_ROUTES_DIR = Path(os.environ.get("DUKKANI_TRAEFIK_ROUTES_DIR", "/docker/traefik/dynamic"))
 FAST_TEMPLATE_DIR = os.environ.get(
     "DUKKANI_FAST_TEMPLATE_DIR",
-    "/home/frappe/frappe-bench/sites/.dukkani-templates",
+    "/opt/dukkani/fast-templates",
 ).rstrip("/")
 EMAIL_SOURCE_SITE = os.environ.get("DUKKANI_EMAIL_SOURCE_SITE", "kareem.dukani.ai").strip()
 EMAIL_ACCOUNT_NAME = os.environ.get("DUKKANI_EMAIL_ACCOUNT_NAME", "Dukkani Gmail").strip()
@@ -249,8 +249,22 @@ def _press_console(code: str, timeout: int = 180) -> subprocess.CompletedProcess
     )
 
 
-def _ensure_press_site(subdomain: str, site: str, admin_password: str) -> None:
-    """Create the tenant through Press and wait for Agent to install all apps."""
+def _ensure_press_site(
+    subdomain: str,
+    site: str,
+    admin_password: str,
+    template: Path | None = None,
+) -> None:
+    """Create the tenant through Press and wait for its initial Agent job.
+
+    Fast-template sites initially install Frappe only.  Importing the local,
+    sanitized template directly afterwards avoids Frappe's very slow restore
+    validation while keeping Press as the owner of the Site lifecycle.
+    """
+    app_rows = '[{"app": "frappe"}]' if template else (
+        '[{"app": "frappe"}, {"app": "erpnext"}, {"app": "builder"}]'
+    )
+    expected_apps = {"frappe"} if template else {"frappe", "erpnext", "builder"}
     code = f"""
 import frappe
 site_name = {site!r}
@@ -269,7 +283,7 @@ if not frappe.db.exists("Site", site_name):
         "plan": {PRESS_PLAN!r},
         "free": 1,
         "admin_password": {admin_password!r},
-        "apps": [{{"app": "frappe"}}, {{"app": "erpnext"}}, {{"app": "builder"}}],
+        "apps": {app_rows},
     }})
     doc.insert(ignore_permissions=True)
     frappe.db.commit()
@@ -290,7 +304,7 @@ else:
     while time.monotonic() < deadline:
         if _site_exists(site):
             installed = installed_apps(site)
-            if {"frappe", "erpnext", "builder"}.issubset(installed):
+            if expected_apps.issubset(installed):
                 break
         time.sleep(2)
     else:
@@ -301,7 +315,10 @@ import frappe
 site_name = {site!r}
 jobs = frappe.get_all(
     "Agent Job",
-    filters={{"site": site_name, "job_type": "New Site"}},
+    filters={{
+        "site": site_name,
+        "job_type": ["in", ["New Site", "New Site from Backup"]],
+    }},
     pluck="name",
     order_by="creation desc",
     limit=1,
@@ -310,7 +327,8 @@ if jobs:
     job = frappe.get_doc("Agent Job", jobs[0])
     if job.status != "Success":
         job.succeed_and_process_job_updates()
-frappe.db.set_value("Site", site_name, "status", "Active", update_modified=False)
+if {not bool(template)!r}:
+    frappe.db.set_value("Site", site_name, "status", "Active", update_modified=False)
 frappe.db.commit()
 print("DUKKANI_PRESS_ACTIVE", site_name)
 """
@@ -321,6 +339,68 @@ print("DUKKANI_PRESS_ACTIVE", site_name)
     )
     if synced.returncode != 0 or not active_marker.search(sync_output):
         raise RuntimeError("Press status sync failed: " + _tail(sync_output, lines=40))
+
+
+def _restore_fast_template(
+    site: str,
+    template: Path,
+    admin_password: str,
+) -> None:
+    """Import a sanitized tenant template without Frappe's slow restore scan."""
+    container_template = "/tmp/dukkani-fast-template.sql.gz"
+    _copy_into_container(template, container_template)
+    imported = _docker(
+        [
+            "exec", CONTAINER, "bash", "-lc",
+            f"gzip -dc {container_template} | bench --site {site} mariadb",
+        ],
+        timeout=300,
+    )
+    if imported.returncode != 0:
+        raise RuntimeError("Fast template import failed: " + _tail(
+            imported.stderr or imported.stdout, lines=40
+        ))
+    migrated = _docker(
+        ["exec", CONTAINER, "bench", "--site", site, "migrate"],
+        timeout=600,
+    )
+    if migrated.returncode != 0:
+        raise RuntimeError("Fast template migration failed: " + _tail(
+            migrated.stderr or migrated.stdout, lines=40
+        ))
+    password_set = _docker(
+        [
+            "exec", CONTAINER, "bench", "--site", site,
+            "set-admin-password", admin_password,
+        ],
+        timeout=120,
+    )
+    if password_set.returncode != 0:
+        raise RuntimeError("Admin password reset failed: " + _tail(
+            password_set.stderr or password_set.stdout, lines=40
+        ))
+
+
+def _activate_press_site(site: str) -> None:
+    """Publish the imported apps and final Active state in Press."""
+    code = f"""
+import frappe
+site_name = {site!r}
+doc = frappe.get_doc("Site", site_name)
+doc.set("apps", [
+    {{"app": "frappe"}},
+    {{"app": "erpnext"}},
+    {{"app": "builder"}},
+])
+doc.db_update_all()
+frappe.db.set_value("Site", site_name, "status", "Active", update_modified=False)
+frappe.db.commit()
+print("DUKKANI_PRESS_TEMPLATE_ACTIVE", site_name)
+"""
+    result = _press_console(code, timeout=180)
+    output = (result.stdout or "") + (result.stderr or "")
+    if result.returncode != 0 or f"DUKKANI_PRESS_TEMPLATE_ACTIVE {site}" not in output:
+        raise RuntimeError("Press template activation failed: " + _tail(output, lines=40))
 
 
 def _register_existing_press_site(
@@ -390,13 +470,12 @@ else:
         )
 
 
-def _fast_template(country: str) -> str | None:
+def _fast_template(country: str) -> Path | None:
     filename = COUNTRY_TEMPLATE.get(country)
     if not filename:
         return None
-    path = f"{FAST_TEMPLATE_DIR}/{filename}"
-    exists = _docker(["exec", CONTAINER, "test", "-f", path], timeout=30)
-    return path if exists.returncode == 0 else None
+    path = Path(FAST_TEMPLATE_DIR) / filename
+    return path if path.is_file() else None
 
 
 def _record_step(subdomain: str, step: str, started: float, **fields) -> None:
@@ -633,7 +712,6 @@ def provision(subdomain: str, merchant_name: str,
                url=public_url, error=None, started_at=_now(),
                provisioning_step="starting", elapsed_seconds=0)
     try:
-        ensure_public_route(subdomain)
         template = _fast_template(country)
         used_fast_template = False
         # (3) إنشاء الـ Site + قاعدة بيانات معزولة + ERPNext
@@ -644,7 +722,17 @@ def provision(subdomain: str, merchant_name: str,
                 started,
                 fast_path=False,
             )
-            _ensure_press_site(subdomain, site, site_admin_password())
+            admin_password = site_admin_password()
+            _ensure_press_site(
+                subdomain,
+                site,
+                admin_password,
+                template=template,
+            )
+            used_fast_template = template is not None
+            if used_fast_template:
+                _record_step(subdomain, "restoring_fast_template", started, fast_path=True)
+                _restore_fast_template(site, template, admin_password)
         else:
             _record_step(
                 subdomain,
@@ -658,6 +746,7 @@ def provision(subdomain: str, merchant_name: str,
                 site_admin_password(),
             )
 
+        ensure_public_route(subdomain)
         if used_fast_template:
             _record_step(subdomain, "personalizing_store", started, fast_path=True)
             finalize = _run_finalizer(
@@ -677,6 +766,7 @@ def provision(subdomain: str, merchant_name: str,
                 ["exec", CONTAINER, "bench", "--site", site, "clear-cache"],
                 timeout=120,
             )
+            _activate_press_site(site)
             _docker(
                 [
                     "exec", CONTAINER, "bench", "--site", site,
