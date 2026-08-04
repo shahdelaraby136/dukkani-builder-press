@@ -11,7 +11,14 @@ import threading
 from urllib.parse import urlencode
 from urllib.request import Request, urlopen
 
-CONTAINER = "dukkani-backend-1"
+CONTAINERS = tuple(
+    value.strip()
+    for value in os.environ.get(
+        "DUKKANI_SITE_CONTAINERS",
+        "dukkani-backend-1,bench-0001-000007-dukkanip",
+    ).split(",")
+    if value.strip()
+)
 PORT = 8090
 BASE_DOMAIN = os.environ.get("DUKKANI_BASE_DOMAIN", "localhost").strip().lower()
 _RUN_LOCK = threading.Lock()
@@ -49,18 +56,19 @@ def _run(site, code, infile=None, indata=None):
     # All requests used the same temporary files. Parallel product/order calls
     # could overwrite each other's code or payload and return an empty result.
     with _RUN_LOCK:
+        container = _container_for_site(site)
         subprocess.run(
-            ["docker", "exec", "-i", CONTAINER, "bash", "-c", "cat > /tmp/_shop.py"],
+            ["docker", "exec", "-i", container, "bash", "-c", "cat > /tmp/_shop.py"],
             input=code.encode("utf-8"), check=True, timeout=30,
         )
         if infile and indata is not None:
             subprocess.run(
-                ["docker", "exec", "-i", CONTAINER, "bash", "-c", f"cat > {infile}"],
+                ["docker", "exec", "-i", container, "bash", "-c", f"cat > {infile}"],
                 input=json.dumps(indata, ensure_ascii=False).encode("utf-8"),
                 check=True, timeout=30,
             )
         result = subprocess.run(
-            ["docker", "exec", "-i", CONTAINER, "bench", "--site", site, "console"],
+            ["docker", "exec", "-i", container, "bench", "--site", site, "console"],
             input="g={}; exec(open('/tmp/_shop.py').read(), g)\n",
             capture_output=True, text=True, encoding="utf-8", errors="replace",
             timeout=120,
@@ -68,6 +76,19 @@ def _run(site, code, infile=None, indata=None):
         if result.returncode:
             raise RuntimeError(result.stderr.strip() or f"storefront command failed ({result.returncode})")
         return result.stdout or ""
+
+
+def _container_for_site(site):
+    """Return the bench container that physically owns the requested site."""
+    for container in CONTAINERS:
+        result = subprocess.run(
+            ["docker", "exec", container, "test", "-f", f"sites/{site}/site_config.json"],
+            capture_output=True,
+            timeout=15,
+        )
+        if result.returncode == 0:
+            return container
+    raise RuntimeError(f"storefront site was not found: {site}")
 
 
 def _marker(out, tag):
