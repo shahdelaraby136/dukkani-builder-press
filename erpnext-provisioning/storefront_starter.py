@@ -46,14 +46,38 @@ PAGE_DATA_SCRIPT = r'''
 company = frappe.db.get_single_value("Global Defaults", "default_company") or "متجري"
 currency = frappe.get_doc("Company", company).default_currency or "SAR"
 products = []
+
+def _item_images(item):
+    images = []
+    primary = item.image or ""
+    if primary:
+        images.append(primary)
+    for row in frappe.get_all(
+        "File",
+        filters={"attached_to_doctype": "Item", "attached_to_name": item.name, "is_folder": 0},
+        fields=["file_url"],
+        order_by="creation asc",
+        limit_page_length=20,
+    ):
+        url = row.file_url or ""
+        if not url:
+            continue
+        if not url.lower().split("?", 1)[0].endswith((".jpg", ".jpeg", ".png", ".webp", ".gif")):
+            continue
+        if url not in images:
+            images.append(url)
+    return images
+
 for item in frappe.db.get_all("Item", filters={"disabled": 0}, fields=["name", "item_name", "description", "image"], limit_page_length=100):
     prices = frappe.db.get_all("Item Price", filters={"item_code": item.name, "selling": 1}, fields=["price_list_rate"], limit_page_length=1)
     price = prices[0].price_list_rate if prices else 0
+    images = _item_images(item)
     products.append({
         "code": item.name,
         "name": item.item_name,
         "description": (item.description or "")[:140],
-        "image": item.image or "https://placehold.co/800x800/f3f4f6/64748b?text=Product",
+        "image": images[0] if images else "https://placehold.co/800x800/f3f4f6/64748b?text=Product",
+        "images": images,
         "display_price": f"{price:,.0f} {currency}",
     })
 data.update({"store_name": company, "products": products})

@@ -104,6 +104,12 @@
       #dukkani-cart-overlay.open{display:block}
       #dukkani-cart-panel{position:absolute;left:0;top:0;height:100%;width:min(440px,94vw);overflow:auto;background:#fff;padding:24px;direction:rtl;font-family:Tajawal,Arial,sans-serif}
       .dukkani-cart-head{display:flex;justify-content:space-between;align-items:center}.dukkani-close{border:0;background:none;font-size:28px;cursor:pointer}
+      .dukkani-product-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit;background:#f8fafc}
+      .dukkani-product-carousel img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0;transition:opacity .55s ease}
+      .dukkani-product-carousel img.active{opacity:1}
+      .dukkani-product-dots{position:absolute;left:10px;right:10px;bottom:9px;display:flex;gap:6px;justify-content:center;pointer-events:none}
+      .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
+      .dukkani-product-dots span.active{background:#fff}
       .dukkani-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eee;padding:14px 0}.dukkani-qty{display:flex;gap:9px;align-items:center}.dukkani-qty button{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer}
       .dukkani-total{display:flex;justify-content:space-between;font-weight:800;font-size:19px;margin:20px 0}.dukkani-form label{display:block;font-weight:700;margin:5px 2px}.dukkani-form input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;font:inherit}.dukkani-location{display:block!important;width:100%;padding:11px;border:1px solid #7c3aed!important;color:#7c3aed!important;-webkit-text-fill-color:#7c3aed!important;background:#fff!important;border-radius:9px;font:800 14px Tajawal,Arial,sans-serif!important;cursor:pointer;margin-bottom:8px;opacity:1!important;visibility:visible!important}.dukkani-location-note{font-size:13px;color:#15803d;margin-bottom:12px}.dukkani-payment{border:1px solid #ddd;border-radius:10px;padding:12px;margin:7px 0 14px}.dukkani-payment label{display:flex;gap:8px;align-items:center;margin:0}.dukkani-payment input{width:auto;margin:0}.dukkani-checkout{width:100%;border:0;border-radius:12px;padding:13px;background:var(--dukkani-accent);color:var(--dukkani-accent-ink);font:700 16px inherit;cursor:pointer}.dukkani-msg{padding:10px 0;color:#b91c1c}.dukkani-empty{text-align:center;color:#777;padding:35px 0}
     </style>`);
@@ -264,6 +270,58 @@
 
   const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
+  function normalizeImages(product) {
+    const images = Array.isArray(product.images) ? product.images : [];
+    const unique = [];
+    images.concat(product.image ? [product.image] : []).forEach(src => {
+      if (typeof src !== "string") return;
+      const value = src.trim();
+      if (value && !unique.includes(value)) unique.push(value);
+    });
+    return unique;
+  }
+
+  function installProductCarousel(card, product) {
+    const images = normalizeImages(product);
+    if (images.length < 2 || card.querySelector(".dukkani-product-carousel")) return;
+    const firstImage = card.querySelector("img");
+    if (!firstImage) return;
+    const parent = firstImage.parentElement;
+    const nextSibling = firstImage.nextSibling;
+    const carousel = document.createElement("div");
+    carousel.className = "dukkani-product-carousel";
+    carousel.style.width = firstImage.style.width || "100%";
+    carousel.style.height = firstImage.style.height || "";
+    carousel.style.aspectRatio = firstImage.style.aspectRatio || getComputedStyle(firstImage).aspectRatio || "1 / 1";
+    if (!carousel.style.aspectRatio || carousel.style.aspectRatio === "auto") carousel.style.aspectRatio = "1 / 1";
+    images.forEach((src, imageIndex) => {
+      const image = imageIndex === 0 ? firstImage : document.createElement("img");
+      image.src = src;
+      image.alt = firstImage.alt || product.name || "";
+      image.classList.toggle("active", imageIndex === 0);
+      carousel.appendChild(image);
+    });
+    const dots = document.createElement("div");
+    dots.className = "dukkani-product-dots";
+    images.forEach((_, dotIndex) => {
+      const dot = document.createElement("span");
+      dot.classList.toggle("active", dotIndex === 0);
+      dots.appendChild(dot);
+    });
+    carousel.appendChild(dots);
+    parent.insertBefore(carousel, nextSibling);
+    let current = 0;
+    const slides = Array.from(carousel.querySelectorAll("img"));
+    const dotList = Array.from(dots.children);
+    window.setInterval(() => {
+      slides[current].classList.remove("active");
+      dotList[current].classList.remove("active");
+      current = (current + 1) % slides.length;
+      slides[current].classList.add("active");
+      dotList[current].classList.add("active");
+    }, 3200);
+  }
+
   async function loadProducts() {
     let lastError;
     for (let attempt = 1; attempt <= PRODUCT_ATTEMPTS; attempt += 1) {
@@ -305,6 +363,7 @@
         button.style.opacity = "";
         button.textContent = button.dataset.readyText || button.textContent;
         button.onclick = () => add(product.code);
+        installProductCarousel(card, product);
       });
       syncThemeColors();
     } catch (error) {

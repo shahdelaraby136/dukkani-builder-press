@@ -131,6 +131,27 @@ def _review_rows(item_code):
         })
     return rows
 
+def _item_images(item):
+    images = []
+    primary = item.get("image") or ""
+    if primary:
+        images.append(primary)
+    for row in frappe.get_all(
+        "File",
+        filters={"attached_to_doctype": "Item", "attached_to_name": item["name"], "is_folder": 0},
+        fields=["file_url"],
+        order_by="creation asc",
+        limit_page_length=20,
+    ):
+        url = row.get("file_url") or ""
+        if not url:
+            continue
+        if not url.lower().split("?", 1)[0].endswith((".jpg", ".jpeg", ".png", ".webp", ".gif")):
+            continue
+        if url not in images:
+            images.append(url)
+    return images
+
 out = []
 for it in frappe.get_all("Item", filters={"disabled":0}, fields=["name","item_name","image","description"]):
     rate = frappe.db.get_value("Item Price", {"item_code":it["name"],"selling":1}, "price_list_rate") or 0
@@ -142,8 +163,9 @@ for it in frappe.get_all("Item", filters={"disabled":0}, fields=["name","item_na
     reviews = _review_rows(it["name"])
     rating_count = len(reviews)
     rating_avg = round(sum(row["rating"] for row in reviews) / rating_count, 1) if rating_count else 0
+    images = _item_images(it)
     out.append({"code":it["name"], "name":it["item_name"], "rate":rate,
-                "image":it.get("image") or "", "desc":(it.get("description") or ""),
+                "image":images[0] if images else "", "images":images, "desc":(it.get("description") or ""),
                 "stock_qty": float(stock_qty), "out_of_stock": float(stock_qty) <= 0,
                 "rating_avg": rating_avg, "rating_count": rating_count,
                 "reviews": reviews[:8]})
