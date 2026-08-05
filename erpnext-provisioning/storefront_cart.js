@@ -125,8 +125,9 @@
       .sense-footer-col a,.sense-footer-col p{color:#8f8b84;display:block;font-size:16px;line-height:1.9;margin:0 0 8px;text-decoration:none}.sense-footer-col b{color:#aaa39a;display:block;font-weight:700;margin-top:8px}
       .sense-footer-app-icon{align-items:center;background:linear-gradient(135deg,#31489c,#25b69b);border:7px solid #f1f1f1;border-radius:999px;color:#fff;display:inline-flex;font-size:42px;font-weight:900;height:116px;justify-content:center;margin-top:6px;width:116px}
       .sense-footer-bottom{background:#1c201f;margin:48px -6% 0;padding:18px 6%}.sense-footer-bottom-inner{align-items:center;display:flex;gap:24px;justify-content:space-between;max-width:1360px;margin:0 auto}.sense-footer-payments,.sense-footer-social{align-items:center;display:flex;gap:14px}.sense-footer-payment{background:#232826;border-radius:8px;color:#ddd;font-size:13px;font-weight:800;padding:8px 12px}.sense-footer-social a{align-items:center;border-radius:999px;color:#fff;display:inline-flex;font-weight:900;height:42px;justify-content:center;text-decoration:none;width:42px}.sense-footer-social a:nth-child(1){background:#c13584}.sense-footer-social a:nth-child(2){background:#1da1f2}.sense-footer-social a:nth-child(3){background:#31569c}.sense-footer-copy{color:#8f8b84;font-size:14px;text-align:center}
-      .sense-whatsapp{align-items:center;background:#0b8f45;border-radius:999px;bottom:82px;color:#fff;display:flex;font-size:34px;height:74px;justify-content:center;left:24px;position:fixed;text-decoration:none;width:74px;z-index:9998}
-      @media(max-width:900px){.sense-footer-grid{grid-template-columns:1fr;text-align:center}.sense-footer-brand{text-align:center}.sense-footer-newsletter{margin:0 auto}.sense-footer-seller{justify-content:center}.sense-footer-bottom-inner{flex-direction:column}.sense-whatsapp{bottom:90px;height:58px;width:58px;font-size:26px}}
+      .sense-whatsapp{align-items:center;background:#0b8f45;border-radius:999px;bottom:150px;box-shadow:0 10px 28px #0004;color:#fff;display:flex;height:64px;justify-content:center;left:24px;position:fixed;text-decoration:none;width:64px;z-index:9998}
+      .sense-whatsapp svg{display:block;height:34px;width:34px;fill:currentColor}
+      @media(max-width:900px){.sense-footer-grid{grid-template-columns:1fr;text-align:center}.sense-footer-brand{text-align:center}.sense-footer-newsletter{margin:0 auto}.sense-footer-seller{justify-content:center}.sense-footer-bottom-inner{flex-direction:column}.sense-whatsapp{bottom:136px;height:56px;width:56px}.sense-whatsapp svg{height:30px;width:30px}}
       .dukkani-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eee;padding:14px 0}.dukkani-qty{display:flex;gap:9px;align-items:center}.dukkani-qty button{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer}
       .dukkani-total{display:flex;justify-content:space-between;font-weight:800;font-size:19px;margin:20px 0}.dukkani-form label{display:block;font-weight:700;margin:5px 2px}.dukkani-form input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;font:inherit}.dukkani-location{display:block!important;width:100%;padding:11px;border:1px solid #7c3aed!important;color:#7c3aed!important;-webkit-text-fill-color:#7c3aed!important;background:#fff!important;border-radius:9px;font:800 14px Tajawal,Arial,sans-serif!important;cursor:pointer;margin-bottom:8px;opacity:1!important;visibility:visible!important}.dukkani-location-note{font-size:13px;color:#15803d;margin-bottom:12px}.dukkani-payment{border:1px solid #ddd;border-radius:10px;padding:12px;margin:7px 0 14px}.dukkani-payment label{display:flex;gap:8px;align-items:center;margin:0}.dukkani-payment input{width:auto;margin:0}.dukkani-checkout{width:100%;border:0;border-radius:12px;padding:13px;background:var(--dukkani-accent);color:var(--dukkani-accent-ink);font:700 16px inherit;cursor:pointer}.dukkani-msg{padding:10px 0;color:#b91c1c}.dukkani-empty{text-align:center;color:#777;padding:35px 0}
     </style>`);
@@ -468,6 +469,17 @@
     `);
   }
 
+  function installSenseWhatsApp() {
+    if (STORE !== "sense" || document.querySelector(".sense-whatsapp")) return;
+    document.body.insertAdjacentHTML("beforeend", `
+      <a class="sense-whatsapp" href="https://wa.me/966555601936" target="_blank" rel="noopener" aria-label="WhatsApp">
+        <svg viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M16.02 3.2A12.66 12.66 0 0 0 5.08 22.23L3.6 28.8l6.7-1.42A12.68 12.68 0 1 0 16.02 3.2Zm0 22.98c-1.95 0-3.84-.55-5.48-1.6l-.4-.25-3.95.84.87-3.85-.27-.42a10.29 10.29 0 1 1 9.23 5.28Zm5.63-7.72c-.31-.16-1.82-.9-2.1-1-.28-.1-.49-.16-.7.16-.2.31-.8 1-.98 1.2-.18.2-.36.23-.67.08-.31-.16-1.3-.48-2.48-1.52-.92-.82-1.54-1.83-1.72-2.14-.18-.31-.02-.48.14-.64.14-.14.31-.36.47-.54.16-.18.2-.31.31-.52.1-.2.05-.39-.03-.54-.08-.16-.7-1.68-.96-2.3-.25-.6-.5-.52-.7-.53h-.6c-.2 0-.54.08-.83.39-.28.31-1.08 1.05-1.08 2.56 0 1.5 1.1 2.96 1.26 3.16.16.2 2.17 3.31 5.25 4.64.73.32 1.31.51 1.75.65.74.23 1.41.2 1.94.12.59-.09 1.82-.74 2.08-1.46.26-.72.26-1.33.18-1.46-.08-.13-.28-.2-.59-.36Z"/>
+        </svg>
+      </a>
+    `);
+  }
+
   async function loadProducts() {
     let lastError;
     for (let attempt = 1; attempt <= PRODUCT_ATTEMPTS; attempt += 1) {
@@ -528,7 +540,7 @@
     installCustomerAccount();
     installUI();
     installHeroCarousel();
-    installSenseFooter();
+    installSenseWhatsApp();
     if (new URLSearchParams(location.search).get("resume") === "checkout" && count()) {
       document.getElementById("dukkani-cart-overlay").classList.add("open");
       renderCart();
