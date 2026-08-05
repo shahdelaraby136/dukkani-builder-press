@@ -116,6 +116,17 @@
       .dukkani-hero-dots{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:7px;justify-content:center;pointer-events:none;z-index:2}
       .dukkani-hero-dots span{width:8px;height:8px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-hero-dots span.active{background:#fff}
+      .sense-footer{direction:rtl;background:#151817;color:#d8d0c4;font-family:Tajawal,Arial,sans-serif;margin-top:0;padding:52px 6% 0;width:100%}
+      .sense-footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;gap:34px;align-items:start;max-width:1360px;margin:0 auto}
+      .sense-footer-brand{text-align:right}.sense-footer-logo{max-width:190px;margin-bottom:18px}.sense-footer-brand p{font-size:18px;line-height:1.9;margin:0 0 20px;color:#f3efe8}
+      .sense-footer-newsletter{display:flex;gap:0;max-width:310px;margin-inline-start:auto}.sense-footer-newsletter input{background:#181c1b;border:1px solid #3b3f3d;border-radius:6px 0 0 6px;color:#fff;direction:ltr;min-width:0;padding:14px;width:100%}.sense-footer-newsletter button,.sense-footer-seller a:first-child{background:#b40e35;border:0;border-radius:4px;color:#fff;font-weight:800;padding:14px 22px;text-decoration:none}
+      .sense-footer-seller{align-items:center;display:flex;gap:12px;justify-content:flex-start;margin-top:26px}.sense-footer-seller span{color:#fff;font-size:18px;text-transform:uppercase}
+      .sense-footer-col{text-align:center}.sense-footer-col h3{color:#f4eee6;font-size:16px;font-weight:900;margin:0 0 22px;text-transform:uppercase}.sense-footer-col h3:after{background:#c10f39;content:"";display:block;height:3px;margin:12px auto 0;width:76px}
+      .sense-footer-col a,.sense-footer-col p{color:#8f8b84;display:block;font-size:16px;line-height:1.9;margin:0 0 8px;text-decoration:none}.sense-footer-col b{color:#aaa39a;display:block;font-weight:700;margin-top:8px}
+      .sense-footer-app-icon{align-items:center;background:linear-gradient(135deg,#31489c,#25b69b);border:7px solid #f1f1f1;border-radius:999px;color:#fff;display:inline-flex;font-size:42px;font-weight:900;height:116px;justify-content:center;margin-top:6px;width:116px}
+      .sense-footer-bottom{background:#1c201f;margin:48px -6% 0;padding:18px 6%}.sense-footer-bottom-inner{align-items:center;display:flex;gap:24px;justify-content:space-between;max-width:1360px;margin:0 auto}.sense-footer-payments,.sense-footer-social{align-items:center;display:flex;gap:14px}.sense-footer-payment{background:#232826;border-radius:8px;color:#ddd;font-size:13px;font-weight:800;padding:8px 12px}.sense-footer-social a{align-items:center;border-radius:999px;color:#fff;display:inline-flex;font-weight:900;height:42px;justify-content:center;text-decoration:none;width:42px}.sense-footer-social a:nth-child(1){background:#c13584}.sense-footer-social a:nth-child(2){background:#1da1f2}.sense-footer-social a:nth-child(3){background:#31569c}.sense-footer-copy{color:#8f8b84;font-size:14px;text-align:center}
+      .sense-whatsapp{align-items:center;background:#0b8f45;border-radius:999px;bottom:82px;color:#fff;display:flex;font-size:34px;height:74px;justify-content:center;left:24px;position:fixed;text-decoration:none;width:74px;z-index:9998}
+      @media(max-width:900px){.sense-footer-grid{grid-template-columns:1fr;text-align:center}.sense-footer-brand{text-align:center}.sense-footer-newsletter{margin:0 auto}.sense-footer-seller{justify-content:center}.sense-footer-bottom-inner{flex-direction:column}.sense-whatsapp{bottom:90px;height:58px;width:58px;font-size:26px}}
       .dukkani-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eee;padding:14px 0}.dukkani-qty{display:flex;gap:9px;align-items:center}.dukkani-qty button{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer}
       .dukkani-total{display:flex;justify-content:space-between;font-weight:800;font-size:19px;margin:20px 0}.dukkani-form label{display:block;font-weight:700;margin:5px 2px}.dukkani-form input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;font:inherit}.dukkani-location{display:block!important;width:100%;padding:11px;border:1px solid #7c3aed!important;color:#7c3aed!important;-webkit-text-fill-color:#7c3aed!important;background:#fff!important;border-radius:9px;font:800 14px Tajawal,Arial,sans-serif!important;cursor:pointer;margin-bottom:8px;opacity:1!important;visibility:visible!important}.dukkani-location-note{font-size:13px;color:#15803d;margin-bottom:12px}.dukkani-payment{border:1px solid #ddd;border-radius:10px;padding:12px;margin:7px 0 14px}.dukkani-payment label{display:flex;gap:8px;align-items:center;margin:0}.dukkani-payment input{width:auto;margin:0}.dukkani-checkout{width:100%;border:0;border-radius:12px;padding:13px;background:var(--dukkani-accent);color:var(--dukkani-accent-ink);font:700 16px inherit;cursor:pointer}.dukkani-msg{padding:10px 0;color:#b91c1c}.dukkani-empty{text-align:center;color:#777;padding:35px 0}
     </style>`);
@@ -399,6 +410,64 @@
     window.setInterval(next, 3000);
   }
 
+  function installSenseFooter() {
+    if (STORE !== "sense" || document.querySelector(".sense-footer")) return;
+    document.body.insertAdjacentHTML("beforeend", `
+      <a class="sense-whatsapp" href="https://wa.me/966555601936" target="_blank" rel="noopener" aria-label="WhatsApp">☏</a>
+      <footer class="sense-footer">
+        <div class="sense-footer-grid">
+          <div class="sense-footer-brand">
+            <img class="sense-footer-logo" src="/files/sense-brand-logo.png" alt="SenSe">
+            <p>متجر إلكتروني خاص يبيع كل المنتجات التي تلبي احتياجاتك</p>
+            <form class="sense-footer-newsletter" onsubmit="event.preventDefault()">
+              <input type="email" placeholder="Your Email Address" aria-label="Your Email Address">
+              <button type="submit">Subscribe</button>
+            </form>
+            <div class="sense-footer-seller"><a href="/signup">APPLY NOW</a><span>BE A SELLER</span></div>
+          </div>
+          <div class="sense-footer-col">
+            <h3>مسجل لدي معروف</h3>
+            <div class="sense-footer-app-icon">م</div>
+          </div>
+          <div class="sense-footer-col">
+            <h3>CONTACT INFO</h3>
+            <b>:Address</b><p>المملكة العربية السعودية - الرياض</p>
+            <b>:Phone</b><p dir="ltr">0555601936</p>
+            <b>:Email</b><p dir="ltr">info@sense.sa</p>
+          </div>
+          <div class="sense-footer-col">
+            <h3>SUPPORT DESK</h3>
+            <a href="/terms">Terms &amp; conditions</a>
+            <a href="/return-policy">Return Policy</a>
+            <a href="/privacy-policy">Privacy Policy</a>
+          </div>
+          <div class="sense-footer-col">
+            <h3>MY ACCOUNT</h3>
+            <a href="/customer-login">Login</a>
+            <a href="/wishlist">My Wishlist</a>
+            <a href="/track-order">Track Order</a>
+          </div>
+        </div>
+        <div class="sense-footer-bottom">
+          <div class="sense-footer-bottom-inner">
+            <div class="sense-footer-payments">
+              <span class="sense-footer-payment">MasterCard</span>
+              <span class="sense-footer-payment">mada</span>
+              <span class="sense-footer-payment">stc pay</span>
+              <span class="sense-footer-payment"> Pay</span>
+            </div>
+            <div class="sense-footer-social">
+              <a href="#" aria-label="Instagram">◎</a>
+              <a href="#" aria-label="Twitter">t</a>
+              <a href="#" aria-label="Facebook">f</a>
+            </div>
+            <div class="sense-footer-copy">جميع الحقوق محفوظة © 2026</div>
+          </div>
+        </div>
+      </footer>
+    `);
+  }
+
   async function loadProducts() {
     let lastError;
     for (let attempt = 1; attempt <= PRODUCT_ATTEMPTS; attempt += 1) {
@@ -459,6 +528,7 @@
     installCustomerAccount();
     installUI();
     installHeroCarousel();
+    installSenseFooter();
     if (new URLSearchParams(location.search).get("resume") === "checkout" && count()) {
       document.getElementById("dukkani-cart-overlay").classList.add("open");
       renderCart();
