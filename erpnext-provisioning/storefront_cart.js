@@ -110,8 +110,8 @@
       .dukkani-product-dots{position:absolute;left:10px;right:10px;bottom:9px;display:flex;gap:6px;justify-content:center;pointer-events:none}
       .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-product-dots span.active{background:#fff}
-      .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit}
-      .dukkani-hero-track{display:flex;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
+      .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit;direction:ltr}
+      .dukkani-hero-track{display:flex;direction:ltr;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
       .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
       .dukkani-hero-dots{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:7px;justify-content:center;pointer-events:none;z-index:2}
       .dukkani-hero-dots span{width:8px;height:8px;border-radius:999px;background:#fff8;border:1px solid #0002}
