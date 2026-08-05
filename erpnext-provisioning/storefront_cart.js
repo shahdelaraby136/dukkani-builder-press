@@ -110,6 +110,7 @@
       .dukkani-product-dots{position:absolute;left:10px;right:10px;bottom:9px;display:flex;gap:6px;justify-content:center;pointer-events:none}
       .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-product-dots span.active{background:#fff}
+      .dukkani-hero-carousel{transition:opacity .45s ease}
       .dukkani-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eee;padding:14px 0}.dukkani-qty{display:flex;gap:9px;align-items:center}.dukkani-qty button{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer}
       .dukkani-total{display:flex;justify-content:space-between;font-weight:800;font-size:19px;margin:20px 0}.dukkani-form label{display:block;font-weight:700;margin:5px 2px}.dukkani-form input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;font:inherit}.dukkani-location{display:block!important;width:100%;padding:11px;border:1px solid #7c3aed!important;color:#7c3aed!important;-webkit-text-fill-color:#7c3aed!important;background:#fff!important;border-radius:9px;font:800 14px Tajawal,Arial,sans-serif!important;cursor:pointer;margin-bottom:8px;opacity:1!important;visibility:visible!important}.dukkani-location-note{font-size:13px;color:#15803d;margin-bottom:12px}.dukkani-payment{border:1px solid #ddd;border-radius:10px;padding:12px;margin:7px 0 14px}.dukkani-payment label{display:flex;gap:8px;align-items:center;margin:0}.dukkani-payment input{width:auto;margin:0}.dukkani-checkout{width:100%;border:0;border-radius:12px;padding:13px;background:var(--dukkani-accent);color:var(--dukkani-accent-ink);font:700 16px inherit;cursor:pointer}.dukkani-msg{padding:10px 0;color:#b91c1c}.dukkani-empty{text-align:center;color:#777;padding:35px 0}
     </style>`);
@@ -322,6 +323,41 @@
     }, 3200);
   }
 
+  async function loadExistingImage(src) {
+    return new Promise(resolve => {
+      const image = new Image();
+      image.onload = () => resolve(src);
+      image.onerror = () => resolve(null);
+      image.src = src;
+    });
+  }
+
+  async function installHeroCarousel() {
+    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const heroImage = Array.from(document.images).find(image =>
+      /\/files\/[^/?]*brand-hero-\d+\.(jpe?g|png|webp)(\?|$)/i.test(image.currentSrc || image.src || "")
+    );
+    if (!heroImage || heroImage.dataset.dukkaniHeroCarousel === "1") return;
+    const source = heroImage.currentSrc || heroImage.src || "";
+    const match = source.match(/^(.*brand-hero-)\d+(\.(?:jpe?g|png|webp)(?:\?.*)?)$/i);
+    if (!match) return;
+    const candidates = [1, 2, 3, 4, 5].map(index => `${match[1]}${index}${match[2]}`);
+    const slides = (await Promise.all(candidates.map(loadExistingImage))).filter(Boolean);
+    if (slides.length < 2) return;
+    let current = Math.max(0, slides.indexOf(source));
+    heroImage.dataset.dukkaniHeroCarousel = "1";
+    heroImage.classList.add("dukkani-hero-carousel");
+    window.setInterval(() => {
+      current = (current + 1) % slides.length;
+      heroImage.style.opacity = "0";
+      const nextSrc = slides[current];
+      window.setTimeout(() => {
+        heroImage.onload = () => { heroImage.style.opacity = "1"; };
+        heroImage.src = nextSrc;
+      }, 260);
+    }, 3800);
+  }
+
   async function loadProducts() {
     let lastError;
     for (let attempt = 1; attempt <= PRODUCT_ATTEMPTS; attempt += 1) {
@@ -381,6 +417,7 @@
     syncThemeColors();
     installCustomerAccount();
     installUI();
+    installHeroCarousel();
     if (new URLSearchParams(location.search).get("resume") === "checkout" && count()) {
       document.getElementById("dukkani-cart-overlay").classList.add("open");
       renderCart();
