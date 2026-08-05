@@ -111,7 +111,7 @@
       .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-product-dots span.active{background:#fff}
       .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit}
-      .dukkani-hero-track{display:flex;flex-direction:row-reverse;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
+      .dukkani-hero-track{display:flex;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
       .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
       .dukkani-hero-dots{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:7px;justify-content:center;pointer-events:none;z-index:2}
       .dukkani-hero-dots span{width:8px;height:8px;border-radius:999px;background:#fff8;border:1px solid #0002}
@@ -338,7 +338,6 @@
   }
 
   async function installHeroCarousel() {
-    if (window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const heroImage = Array.from(document.images).find(image =>
       /\/files\/[^/?]*brand-hero-\d+\.(jpe?g|png|webp)(\?|$)/i.test(image.currentSrc || image.src || "")
     );
@@ -385,17 +384,19 @@
       return dot;
     });
     const render = () => {
-      track.style.transform = `translateX(${current * 100}%)`;
+      track.style.transform = `translateX(-${current * 100}%)`;
       dotItems.forEach((dot, index) => dot.classList.toggle("active", index === current));
+    };
+    const next = () => {
+      current = (current + 1) % slides.length;
+      render();
     };
     carousel.appendChild(track);
     carousel.appendChild(dots);
     parent.insertBefore(carousel, nextSibling);
     render();
-    window.setInterval(() => {
-      current = (current + 1) % slides.length;
-      render();
-    }, 3800);
+    window.setTimeout(next, 1000);
+    window.setInterval(next, 3000);
   }
 
   async function loadProducts() {
