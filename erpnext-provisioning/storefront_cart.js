@@ -3,6 +3,7 @@
   const API = "";
   const STORE = location.hostname.split(".")[0];
   let products = [];
+  let storeCurrency = "SAR";
   const CART_KEY = `dukkani-cart-${STORE}`;
   const LEGACY_CUSTOMER_KEY = `dukkani-customer-${STORE}`;
   const CUSTOMER_KEY = `dukkani-customer-v2-${STORE}`;
@@ -110,6 +111,18 @@
       .dukkani-product-dots{position:absolute;left:10px;right:10px;bottom:9px;display:flex;gap:6px;justify-content:center;pointer-events:none}
       .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-product-dots span.active{background:#fff}
+      .dukkani-product-clickable{cursor:pointer}
+      .dukkani-product-clickable:hover{transform:translateY(-2px);transition:transform .2s ease}
+      #dukkani-product-detail-page{background:#151817;color:#f5f0e8;direction:rtl;font-family:Cairo,Tajawal,Arial,sans-serif;min-height:100vh;padding:28px 5% 90px}
+      body.dukkani-detail-open>body{display:block}
+      body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button){display:none!important}
+      .dukkani-detail-wrap{max-width:1220px;margin:0 auto}
+      .dukkani-detail-back{background:transparent;border:1px solid #343938;border-radius:999px;color:#d8d0c4;cursor:pointer;font:800 14px Tajawal,Arial,sans-serif;margin-bottom:26px;padding:10px 18px}
+      .dukkani-detail-grid{display:grid;grid-template-columns:minmax(320px,520px) 1fr;gap:48px;align-items:start}
+      .dukkani-detail-gallery{display:grid;gap:14px}.dukkani-detail-main-image{aspect-ratio:1/1;background:#101312;border:1px solid #303534;border-radius:22px;overflow:hidden}.dukkani-detail-main-image img{height:100%;object-fit:cover;width:100%}
+      .dukkani-detail-thumbs{display:flex;gap:10px;flex-wrap:wrap}.dukkani-detail-thumbs button{background:#101312;border:1px solid #303534;border-radius:12px;cursor:pointer;height:78px;overflow:hidden;padding:0;width:78px}.dukkani-detail-thumbs button.active{border-color:#b40e35}.dukkani-detail-thumbs img{height:100%;object-fit:cover;width:100%}
+      .dukkani-detail-info h1{font-size:38px;line-height:1.35;margin:0 0 14px}.dukkani-detail-code{color:#8f8b84;direction:ltr;font-size:14px;margin-bottom:14px;text-align:right}.dukkani-detail-price{color:#b40e35;font-size:30px;font-weight:900;margin:0 0 18px}.dukkani-detail-desc{color:#d8d0c4;font-size:17px;line-height:1.95;margin:0 0 24px}.dukkani-detail-stock{border-radius:999px;display:inline-block;font-weight:800;margin-bottom:22px;padding:8px 14px}.dukkani-detail-stock.in{background:#063d24;color:#7ee2a8}.dukkani-detail-stock.out{background:#4b0707;color:#fecaca}.dukkani-detail-add{background:#b40e35;border:0;border-radius:12px;color:#fff;cursor:pointer;font:900 17px Tajawal,Arial,sans-serif;padding:15px 28px;min-width:220px}.dukkani-detail-add:disabled{cursor:not-allowed;opacity:.55}.dukkani-detail-reviews{border-top:1px solid #303534;margin-top:34px;padding-top:24px}.dukkani-detail-reviews h2{font-size:22px;margin:0 0 14px}.dukkani-review{background:#101312;border:1px solid #303534;border-radius:14px;margin-bottom:10px;padding:14px}.dukkani-review-stars{color:#f59e0b;font-weight:900}
+      @media(max-width:850px){#dukkani-product-detail-page{padding:20px 18px 90px}.dukkani-detail-grid{grid-template-columns:1fr;gap:28px}.dukkani-detail-info h1{font-size:28px}}
       .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit;direction:ltr}
       .dukkani-hero-track{display:flex;flex-direction:row-reverse;direction:ltr;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
       .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
@@ -298,6 +311,119 @@
     });
     return unique;
   }
+
+  function escapeHtml(value) {
+    return String(value == null ? "" : value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function productDetailUrl(code) {
+    const url = new URL(location.href);
+    url.searchParams.set("product", code);
+    url.hash = "";
+    return url.pathname + url.search;
+  }
+
+  function findProduct(code) {
+    const decoded = decodeURIComponent(code || "");
+    return products.find(row => String(row.code) === decoded);
+  }
+
+  function renderProductReviews(product) {
+    const reviews = Array.isArray(product.reviews) ? product.reviews : [];
+    if (!reviews.length) {
+      return `<div class="dukkani-review">لا توجد تقييمات لهذا المنتج حتى الآن.</div>`;
+    }
+    return reviews.map(review => {
+      const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
+      return `<div class="dukkani-review">
+        <div class="dukkani-review-stars">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</div>
+        <strong>${escapeHtml(review.name || "عميل")}</strong>
+        <p>${escapeHtml(review.comment || "")}</p>
+      </div>`;
+    }).join("");
+  }
+
+  function renderProductDetail(product, replaceHistory) {
+    if (!product) return;
+    const existing = document.getElementById("dukkani-product-detail-page");
+    if (existing) existing.remove();
+    const images = normalizeImages(product);
+    const mainImage = images[0] || product.image || "https://placehold.co/900x900/f3f4f6/64748b?text=Product";
+    const outOfStock = Boolean(product.out_of_stock);
+    const detail = document.createElement("main");
+    detail.id = "dukkani-product-detail-page";
+    detail.innerHTML = `
+      <div class="dukkani-detail-wrap">
+        <button type="button" class="dukkani-detail-back">← الرجوع للمتجر</button>
+        <div class="dukkani-detail-grid">
+          <div class="dukkani-detail-gallery">
+            <div class="dukkani-detail-main-image"><img src="${escapeHtml(mainImage)}" alt="${escapeHtml(product.name || "")}"></div>
+            <div class="dukkani-detail-thumbs">
+              ${images.map((src, index) => `<button type="button" class="${index === 0 ? "active" : ""}" data-src="${escapeHtml(src)}"><img src="${escapeHtml(src)}" alt="${escapeHtml(product.name || "")}"></button>`).join("")}
+            </div>
+          </div>
+          <div class="dukkani-detail-info">
+            <h1>${escapeHtml(product.name || "")}</h1>
+            <div class="dukkani-detail-code">${escapeHtml(product.code || "")}</div>
+            <div class="dukkani-detail-price">${money(product.rate)} ${escapeHtml(storeCurrency)}</div>
+            <div class="dukkani-detail-stock ${outOfStock ? "out" : "in"}">${outOfStock ? "غير متوفر" : "متوفر"}</div>
+            <div class="dukkani-detail-desc">${product.desc || product.description || "لا يوجد وصف تفصيلي لهذا المنتج."}</div>
+            <button type="button" class="dukkani-detail-add" ${outOfStock ? "disabled" : ""}>أضف للسلة</button>
+            <section class="dukkani-detail-reviews">
+              <h2>تقييمات المنتج</h2>
+              ${renderProductReviews(product)}
+            </section>
+          </div>
+        </div>
+      </div>`;
+    document.body.appendChild(detail);
+    document.body.classList.add("dukkani-detail-open");
+    const main = detail.querySelector(".dukkani-detail-main-image img");
+    detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(button => {
+      button.addEventListener("click", () => {
+        detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(row => row.classList.remove("active"));
+        button.classList.add("active");
+        main.src = button.dataset.src || main.src;
+      });
+    });
+    detail.querySelector(".dukkani-detail-add").addEventListener("click", () => add(product.code));
+    detail.querySelector(".dukkani-detail-back").addEventListener("click", () => closeProductDetail(true));
+    if (replaceHistory) history.pushState({ product: product.code }, "", productDetailUrl(product.code));
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
+  function closeProductDetail(updateHistory) {
+    const detail = document.getElementById("dukkani-product-detail-page");
+    if (detail) detail.remove();
+    document.body.classList.remove("dukkani-detail-open");
+    if (updateHistory) {
+      const url = new URL(location.href);
+      url.searchParams.delete("product");
+      history.pushState({}, "", url.pathname + url.search + url.hash);
+    }
+  }
+
+  function openProductDetail(code, replaceHistory = true) {
+    const product = findProduct(code);
+    if (!product) return;
+    renderProductDetail(product, replaceHistory);
+  }
+
+  function openInitialProductDetail() {
+    const code = new URLSearchParams(location.search).get("product");
+    if (code) openProductDetail(code, false);
+  }
+
+  window.addEventListener("popstate", () => {
+    const code = new URLSearchParams(location.search).get("product");
+    if (code) openProductDetail(code, false);
+    else closeProductDetail(false);
+  });
 
   function installProductCarousel(card, product) {
     const images = normalizeImages(product);
@@ -493,6 +619,7 @@
         if (!response.ok) throw new Error(`product request failed (${response.status})`);
         const data = await response.json();
         if (!Array.isArray(data.items) || !data.items.length) throw new Error("product list is empty");
+        storeCurrency = data.currency || storeCurrency;
         return data.items;
       } catch (error) {
         lastError = error;
@@ -520,10 +647,27 @@
         button.removeAttribute("aria-busy");
         button.style.opacity = "";
         button.textContent = button.dataset.readyText || button.textContent;
-        button.onclick = () => add(product.code);
+        button.onclick = event => {
+          event.preventDefault();
+          event.stopPropagation();
+          add(product.code);
+        };
+        card.classList.add("dukkani-product-clickable");
+        card.setAttribute("role", "link");
+        card.setAttribute("tabindex", "0");
+        card.addEventListener("click", event => {
+          if (event.target.closest("button, a, input, textarea, select")) return;
+          openProductDetail(product.code);
+        });
+        card.addEventListener("keydown", event => {
+          if (event.key !== "Enter") return;
+          event.preventDefault();
+          openProductDetail(product.code);
+        });
         installProductCarousel(card, product);
       });
       syncThemeColors();
+      openInitialProductDetail();
     } catch (error) {
       console.error("Dukkani cart:", error);
       setProductButtonsLoading(false);
