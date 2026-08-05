@@ -110,7 +110,12 @@
       .dukkani-product-dots{position:absolute;left:10px;right:10px;bottom:9px;display:flex;gap:6px;justify-content:center;pointer-events:none}
       .dukkani-product-dots span{width:7px;height:7px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-product-dots span.active{background:#fff}
-      .dukkani-hero-carousel{transition:opacity .45s ease}
+      .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit}
+      .dukkani-hero-track{display:flex;flex-direction:row-reverse;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
+      .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
+      .dukkani-hero-dots{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:7px;justify-content:center;pointer-events:none;z-index:2}
+      .dukkani-hero-dots span{width:8px;height:8px;border-radius:999px;background:#fff8;border:1px solid #0002}
+      .dukkani-hero-dots span.active{background:#fff}
       .dukkani-row{display:grid;grid-template-columns:1fr auto;gap:8px;border-bottom:1px solid #eee;padding:14px 0}.dukkani-qty{display:flex;gap:9px;align-items:center}.dukkani-qty button{width:30px;height:30px;border:1px solid #ddd;background:#fff;border-radius:8px;cursor:pointer}
       .dukkani-total{display:flex;justify-content:space-between;font-weight:800;font-size:19px;margin:20px 0}.dukkani-form label{display:block;font-weight:700;margin:5px 2px}.dukkani-form input{box-sizing:border-box;width:100%;padding:11px;border:1px solid #ddd;border-radius:9px;margin:5px 0 11px;font:inherit}.dukkani-location{display:block!important;width:100%;padding:11px;border:1px solid #7c3aed!important;color:#7c3aed!important;-webkit-text-fill-color:#7c3aed!important;background:#fff!important;border-radius:9px;font:800 14px Tajawal,Arial,sans-serif!important;cursor:pointer;margin-bottom:8px;opacity:1!important;visibility:visible!important}.dukkani-location-note{font-size:13px;color:#15803d;margin-bottom:12px}.dukkani-payment{border:1px solid #ddd;border-radius:10px;padding:12px;margin:7px 0 14px}.dukkani-payment label{display:flex;gap:8px;align-items:center;margin:0}.dukkani-payment input{width:auto;margin:0}.dukkani-checkout{width:100%;border:0;border-radius:12px;padding:13px;background:var(--dukkani-accent);color:var(--dukkani-accent-ink);font:700 16px inherit;cursor:pointer}.dukkani-msg{padding:10px 0;color:#b91c1c}.dukkani-empty{text-align:center;color:#777;padding:35px 0}
     </style>`);
@@ -346,15 +351,50 @@
     if (slides.length < 2) return;
     let current = Math.max(0, slides.indexOf(source));
     heroImage.dataset.dukkaniHeroCarousel = "1";
-    heroImage.classList.add("dukkani-hero-carousel");
+    const parent = heroImage.parentElement;
+    if (!parent) return;
+    const nextSibling = heroImage.nextSibling;
+    const computed = window.getComputedStyle(heroImage);
+    const carousel = document.createElement("div");
+    carousel.className = "dukkani-hero-carousel";
+    carousel.style.width = heroImage.style.width || "100%";
+    carousel.style.height = heroImage.style.height || computed.height || "";
+    carousel.style.aspectRatio = heroImage.style.aspectRatio || computed.aspectRatio || "";
+    if (!carousel.style.aspectRatio || carousel.style.aspectRatio === "auto") {
+      carousel.style.aspectRatio = heroImage.naturalWidth && heroImage.naturalHeight
+        ? `${heroImage.naturalWidth} / ${heroImage.naturalHeight}`
+        : "16 / 9";
+    }
+    carousel.style.borderRadius = computed.borderRadius;
+    const track = document.createElement("div");
+    track.className = "dukkani-hero-track";
+    slides.forEach((src, index) => {
+      const slide = index === 0 ? heroImage : document.createElement("img");
+      slide.src = src;
+      slide.alt = heroImage.alt || "Dukkani hero";
+      slide.removeAttribute("style");
+      slide.dataset.dukkaniHeroCarousel = "1";
+      track.appendChild(slide);
+    });
+    const dots = document.createElement("div");
+    dots.className = "dukkani-hero-dots";
+    const dotItems = slides.map((_, index) => {
+      const dot = document.createElement("span");
+      dot.className = index === current ? "active" : "";
+      dots.appendChild(dot);
+      return dot;
+    });
+    const render = () => {
+      track.style.transform = `translateX(${current * 100}%)`;
+      dotItems.forEach((dot, index) => dot.classList.toggle("active", index === current));
+    };
+    carousel.appendChild(track);
+    carousel.appendChild(dots);
+    parent.insertBefore(carousel, nextSibling);
+    render();
     window.setInterval(() => {
       current = (current + 1) % slides.length;
-      heroImage.style.opacity = "0";
-      const nextSrc = slides[current];
-      window.setTimeout(() => {
-        heroImage.onload = () => { heroImage.style.opacity = "1"; };
-        heroImage.src = nextSrc;
-      }, 260);
+      render();
     }, 3800);
   }
 
