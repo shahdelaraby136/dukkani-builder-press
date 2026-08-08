@@ -597,11 +597,14 @@
     if (code) openProductDetail(code, false);
   }
 
-  window.addEventListener("popstate", () => {
+  function syncProductRoute() {
     const code = new URLSearchParams(location.search).get("product");
     if (code) openProductDetail(code, false);
     else closeProductDetail(false);
-  });
+  }
+
+  window.addEventListener("popstate", syncProductRoute);
+  window.addEventListener("hashchange", syncProductRoute);
 
   function installProductCarousel(card, product) {
     const images = normalizeImages(product);
