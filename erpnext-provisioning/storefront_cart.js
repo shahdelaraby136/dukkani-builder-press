@@ -84,6 +84,46 @@
     });
   }
 
+  function installSenseHeader() {
+    if (STORE !== "sense" || document.querySelector(".sense-store-nav")) return;
+    const nav = document.querySelector("nav");
+    if (!nav) return;
+    nav.className = `${nav.className || ""} sense-store-nav`.trim();
+    nav.innerHTML = `
+      <div class="sense-store-nav-top">
+        <form class="sense-store-search" action="/#products" role="search">
+          <button type="submit" aria-label="Search">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2.2" aria-hidden="true">
+              <circle cx="11" cy="11" r="7"></circle>
+              <path d="m16.5 16.5 4 4"></path>
+            </svg>
+          </button>
+          <input type="search" name="q" placeholder="...I am shopping for" aria-label="Search products">
+        </form>
+        <a class="sense-store-logo" href="/" aria-label="Sense home">
+          <img src="/files/sense-brand-logo.png" alt="SenSe">
+        </a>
+      </div>
+      <div class="sense-store-links" aria-label="Store links">
+        <a href="/blog">Blogs</a>
+        <a href="#brands">All Brands</a>
+        <a href="#categories">All categories</a>
+      </div>
+    `;
+    const search = nav.querySelector(".sense-store-search");
+    search.addEventListener("submit", event => {
+      event.preventDefault();
+      const term = nav.querySelector("input[name='q']").value.trim().toLowerCase();
+      const target = document.getElementById("products");
+      if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
+      if (!term) return;
+      const match = products.find(product =>
+        [product.name, product.code, product.description].some(value => String(value || "").toLowerCase().includes(term))
+      );
+      if (match) openProductDetail(match.code);
+    });
+  }
+
   function syncThemeColors() {
     const themeButton = document.querySelector("#products [data-product-code], #products .dukkani-add");
     if (!themeButton) return;
@@ -143,6 +183,12 @@
       .dukkani-hero-dots{position:absolute;left:16px;right:16px;bottom:14px;display:flex;gap:7px;justify-content:center;pointer-events:none;z-index:2}
       .dukkani-hero-dots span{width:8px;height:8px;border-radius:999px;background:#fff8;border:1px solid #0002}
       .dukkani-hero-dots span.active{background:#fff}
+      .sense-store-nav{background:#151817;border-top:3px solid #b40e35;border-bottom:1px solid #2e3331;color:#f4eee6;direction:ltr;font-family:Tajawal,Arial,sans-serif;padding:18px 6% 0}
+      .sense-store-nav-top{align-items:center;display:grid;gap:42px;grid-template-columns:minmax(260px,1fr) auto;margin:0 auto;max-width:1360px}
+      .sense-store-search{display:flex;min-width:0}.sense-store-search button{align-items:center;background:#b40e35;border:0;color:#fff;cursor:pointer;display:flex;height:60px;justify-content:center;width:60px}.sense-store-search svg{height:30px;width:30px;stroke:currentColor}.sense-store-search input{background:#151817;border:1px solid #3b403e;border-left:0;color:#f4eee6;direction:rtl;flex:1;font:500 19px Tajawal,Arial,sans-serif;height:60px;min-width:0;padding:0 22px;text-align:right}.sense-store-search input::placeholder{color:#b23a54;opacity:.85}
+      .sense-store-logo{display:inline-flex;justify-self:end}.sense-store-logo img{display:block;max-height:58px;max-width:220px;object-fit:contain}
+      .sense-store-links{align-items:center;display:flex;gap:34px;justify-content:flex-end;margin:0 auto;max-width:1360px;padding:26px 0 28px}.sense-store-links a{color:#f4eee6;font:900 18px Tajawal,Arial,sans-serif;text-decoration:none}.sense-store-links a:nth-child(n+2){color:#f54873}.sense-store-links a:hover{color:#fff}
+      @media(max-width:760px){.sense-store-nav{padding-left:18px;padding-right:18px}.sense-store-nav-top{gap:16px;grid-template-columns:1fr}.sense-store-logo{justify-self:center;order:-1}.sense-store-search button{height:52px;width:54px}.sense-store-search input{height:52px;font-size:16px}.sense-store-links{flex-wrap:wrap;gap:18px;justify-content:center;padding:20px 0 22px}.sense-store-links a{font-size:16px}}
       .sense-footer{direction:rtl;background:#151817;color:#d8d0c4;font-family:Tajawal,Arial,sans-serif;margin-top:0;padding:52px 6% 0;width:100%}
       .sense-footer-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr 1fr;gap:34px;align-items:start;max-width:1360px;margin:0 auto}
       .sense-footer-brand{text-align:right}.sense-footer-logo{max-width:190px;margin-bottom:18px}.sense-footer-brand p{font-size:18px;line-height:1.9;margin:0 0 20px;color:#f3efe8}
@@ -914,6 +960,7 @@
   async function start() {
     syncThemeColors();
     installCustomerAccount();
+    installSenseHeader();
     installUI();
     installHeroCarousel();
     installSenseCategories();
