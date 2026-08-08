@@ -360,6 +360,26 @@
     if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 
+  function bindSenseCategoryCards(root) {
+    if (!root) return;
+    root.querySelectorAll("a").forEach(card => {
+      if (card.dataset.senseCategoryBound === "1") return;
+      const text = card.textContent.toLowerCase();
+      const category = /مكياج|makeup/.test(text) ? "makeup"
+        : /عناية|care/.test(text) ? "care"
+        : /أجهزة|اجهزة|device/.test(text) ? "devices"
+        : /عطور|عطر|perfume|fragrance/.test(text) ? "perfume"
+        : /أظافر|اظافر|nail/.test(text) ? "nails" : "all";
+      card.dataset.senseCategoryBound = "1";
+      card.dataset.category = category;
+      card.href = "/#products";
+      card.addEventListener("click", event => {
+        event.preventDefault();
+        filterSenseProducts(category);
+      });
+    });
+  }
+
   function setProductButtonsLoading(loading) {
     productCards().forEach(card => {
       const button = card.querySelector('[data-product-code], .dukkani-add');
@@ -802,6 +822,7 @@
     if (STORE !== "sense" || document.getElementById("dukkani-sense-categories")) return;
     const existing = document.getElementById("categories");
     if (existing) {
+      bindSenseCategoryCards(existing);
       if (location.hash === "#categories") requestAnimationFrame(() => existing.scrollIntoView({ block: "start" }));
       return;
     }
@@ -824,6 +845,7 @@
       event.preventDefault();
       filterSenseProducts(card.dataset.category);
     }));
+    bindSenseCategoryCards(section);
     const productsSection = document.getElementById("products");
     const footer = document.querySelector(".sense-footer");
     const target = productsSection || footer;
