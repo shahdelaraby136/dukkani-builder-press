@@ -378,6 +378,21 @@
         filterSenseProducts(category);
       });
     });
+    const imageCategories = ["makeup", "care", "devices", "perfume", "nails", "all"];
+    root.querySelectorAll("img").forEach((image, index) => {
+      if (image.dataset.senseCategoryBound === "1") return;
+      const category = imageCategories[index] || "all";
+      image.dataset.senseCategoryBound = "1";
+      let card = image.closest("a,button,[role='button']") || image.parentElement;
+      if (card && card !== root) {
+        card.style.cursor = "pointer";
+        card.addEventListener("click", event => {
+          event.preventDefault();
+          event.stopPropagation();
+          filterSenseProducts(category);
+        });
+      }
+    });
   }
 
   function setProductButtonsLoading(loading) {
