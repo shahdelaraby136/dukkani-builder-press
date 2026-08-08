@@ -3,6 +3,7 @@
   const API = "";
   const STORE = location.hostname.split(".")[0];
   let products = [];
+  let activeSenseCategory = "all";
   let storeCurrency = "SAR";
   const CART_KEY = `dukkani-cart-${STORE}`;
   const LEGACY_CUSTOMER_KEY = `dukkani-customer-${STORE}`;
@@ -338,6 +339,25 @@
 
   function productCards() {
     return Array.from(document.querySelectorAll("#products article"));
+  }
+
+  function senseProductCategory(product) {
+    const text = `${product?.name || ""} ${product?.code || ""} ${product?.desc || ""}`.toLowerCase();
+    if (/e\.l\.f|هايلايتر|مكياج|makeup/.test(text)) return "makeup";
+    if (/سيروم|كريستال|عناية|care|زيت الأرجان|زيت الزيتون/.test(text)) return "care";
+    if (/عطر|عطور|perfume|fragrance/.test(text)) return "perfume";
+    if (/أظافر|اظافر|nail/.test(text)) return "nails";
+    return "devices";
+  }
+
+  function filterSenseProducts(category = "all") {
+    activeSenseCategory = category;
+    productCards().forEach((card, index) => {
+      const product = products[index];
+      card.style.display = category === "all" || (product && senseProductCategory(product) === category) ? "" : "none";
+    });
+    const target = document.getElementById("products");
+    if (target) target.scrollIntoView({ block: "start", behavior: "smooth" });
   }
 
   function setProductButtonsLoading(loading) {
@@ -792,14 +812,18 @@
       <h2>الأقسام</h2>
       <p>تصفحي أقسام سينس الرئيسية واختاري منتجاتك بسهولة</p>
       <div id="dukkani-sense-categories" class="sense-category-grid">
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💄</span><span>المكياج</span></a>
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">✨</span><span>العناية</span></a>
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💇</span><span>الأجهزة</span></a>
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">🌸</span><span>العطور</span></a>
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💅</span><span>الأظافر</span></a>
-        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">%</span><span>العروض والخصومات</span></a>
+        <a class="sense-category-card" data-category="makeup" href="/#products"><span class="sense-category-icon">💄</span><span>المكياج</span></a>
+        <a class="sense-category-card" data-category="care" href="/#products"><span class="sense-category-icon">✨</span><span>العناية</span></a>
+        <a class="sense-category-card" data-category="devices" href="/#products"><span class="sense-category-icon">💇</span><span>الأجهزة</span></a>
+        <a class="sense-category-card" data-category="perfume" href="/#products"><span class="sense-category-icon">🌸</span><span>العطور</span></a>
+        <a class="sense-category-card" data-category="nails" href="/#products"><span class="sense-category-icon">💅</span><span>الأظافر</span></a>
+        <a class="sense-category-card" data-category="all" href="/#products"><span class="sense-category-icon">%</span><span>العروض والخصومات</span></a>
       </div>
     `;
+    section.querySelectorAll("[data-category]").forEach(card => card.addEventListener("click", event => {
+      event.preventDefault();
+      filterSenseProducts(card.dataset.category);
+    }));
     const productsSection = document.getElementById("products");
     const footer = document.querySelector(".sense-footer");
     const target = productsSection || footer;
@@ -922,6 +946,7 @@
     setProductButtonsLoading(true);
     try {
       products = await loadProducts();
+      filterSenseProducts(activeSenseCategory);
       productCards().forEach((card, index) => {
         const product = products[index]; if (!product) return;
         const button = card.querySelector('[data-product-code], .dukkani-add');
