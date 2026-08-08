@@ -444,8 +444,14 @@
     const mainImage = images[0] || product.image || "https://placehold.co/900x900/f3f4f6/64748b?text=Product";
     const outOfStock = Boolean(product.out_of_stock);
     const related = relatedProducts(product);
-    const pageFooter = STORE === "sense"
-      ? (document.querySelector(".sense-footer")?.outerHTML || "").replace('class="sense-footer"', 'class="sense-footer sense-footer-detail"')
+    const footerElement = STORE === "sense"
+      ? (document.querySelector(".sense-footer") || Array.from(document.querySelectorAll("footer")).find(footer => {
+        const text = footer.textContent.replace(/\s+/g, " ").trim();
+        return text.includes("CONTACT INFO") || text.includes("MY ACCOUNT") || text.includes("SUPPORT DESK");
+      }))
+      : null;
+    const pageFooter = footerElement
+      ? footerElement.outerHTML.replace('class="', 'class="sense-footer-detail ')
       : "";
     const detail = document.createElement("main");
     detail.id = "dukkani-product-detail-page";
@@ -723,8 +729,8 @@
     if (STORE !== "sense" || document.getElementById("dukkani-sense-categories")) return;
     const existing = document.getElementById("categories");
     if (existing) {
-      existing.id = "sense-original-categories-anchor";
-      existing.setAttribute("data-dukkani-old-anchor", "categories");
+      if (location.hash === "#categories") requestAnimationFrame(() => existing.scrollIntoView({ block: "start" }));
+      return;
     }
     const section = document.createElement("section");
     section.id = "categories";
@@ -749,8 +755,23 @@
     if (location.hash === "#categories") requestAnimationFrame(() => section.scrollIntoView({ block: "start" }));
   }
 
+  function cleanSenseBuilderFooters() {
+    if (STORE !== "sense") return;
+    document.querySelectorAll("footer").forEach(footer => {
+      const text = footer.textContent.replace(/\s+/g, " ").trim();
+      const isPromoFooter = text.includes("سينس") && text.includes("الجمال والعناية") && !text.includes("CONTACT INFO");
+      if (isPromoFooter) footer.remove();
+    });
+  }
+
   function installSenseFooter() {
-    if (STORE !== "sense" || document.querySelector(".sense-footer")) return;
+    if (STORE !== "sense") return;
+    cleanSenseBuilderFooters();
+    const existingFullFooter = Array.from(document.querySelectorAll("footer")).find(footer => {
+      const text = footer.textContent.replace(/\s+/g, " ").trim();
+      return text.includes("CONTACT INFO") || text.includes("MY ACCOUNT") || text.includes("SUPPORT DESK");
+    });
+    if (document.querySelector(".sense-footer") || existingFullFooter) return;
     document.body.insertAdjacentHTML("beforeend", `
       <footer class="sense-footer">
         <div class="sense-footer-grid">
