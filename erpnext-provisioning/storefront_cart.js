@@ -136,6 +136,7 @@
       .dukkani-detail-tabs{background:#fff;border:1px solid #e5e7eb;border-radius:4px;margin-top:24px}.dukkani-detail-tabs h2{border-bottom:1px solid #eee;color:#222;font-size:20px;margin:0;padding:18px 22px}.dukkani-detail-desc{color:#555;font-size:16px;line-height:2;padding:20px 22px}.dukkani-detail-reviews{border-top:1px solid #eeeeee;margin:0;padding:20px 22px}.dukkani-detail-reviews h2{border:0;font-size:19px;margin:0 0 14px;padding:0}.dukkani-review{background:#fafafa;border:1px solid #eeeeee;border-radius:4px;margin-bottom:10px;padding:14px}.dukkani-review-stars{color:#f59e0b;font-weight:900}
       .dukkani-related{margin-top:28px}.dukkani-related h2{color:#222;font-size:22px;margin:0 0 16px}.dukkani-related-grid{display:grid;gap:18px;grid-template-columns:repeat(4,minmax(0,1fr))}.dukkani-related-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;color:#222;cursor:pointer;padding:14px;text-align:center}.dukkani-related-card img{aspect-ratio:1/1;object-fit:contain;width:100%}.dukkani-related-card h3{font-size:14px;line-height:1.6;margin:10px 0 8px}.dukkani-related-card strong{color:#e62e4d}
       @media(max-width:900px){.dukkani-detail-top-inner{grid-template-columns:1fr;justify-items:center;padding-left:16px;padding-right:16px}.dukkani-detail-wrap{padding-left:16px;padding-right:16px}.dukkani-detail-search{width:100%}.dukkani-detail-nav-inner{flex-wrap:wrap;gap:12px;justify-content:center}.dukkani-detail-grid{grid-template-columns:1fr;direction:rtl}.dukkani-detail-info h1{font-size:23px}.dukkani-detail-actions{align-items:stretch;flex-direction:column}.dukkani-detail-add,.dukkani-detail-buy{width:100%}.dukkani-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+      .sense-categories{direction:rtl;background:#151817;color:#fff;font-family:Tajawal,Arial,sans-serif;padding:64px 6% 72px;text-align:center}.sense-categories h2{font-size:38px;font-weight:900;margin:0 0 14px}.sense-categories p{color:#d8d0c4;font-size:18px;margin:0 0 34px}.sense-category-grid{display:grid;gap:18px;grid-template-columns:repeat(6,minmax(0,1fr));margin:0 auto;max-width:1260px}.sense-category-card{align-items:center;background:#1e2221;border:1px solid #333836;border-radius:18px;color:#fff;display:flex;flex-direction:column;font-size:18px;font-weight:900;gap:12px;min-height:130px;justify-content:center;text-decoration:none;transition:transform .2s ease,border-color .2s ease}.sense-category-card:hover{border-color:#f54873;transform:translateY(-3px)}.sense-category-icon{align-items:center;background:#b40e35;border-radius:999px;display:inline-flex;font-size:28px;height:58px;justify-content:center;width:58px}@media(max-width:1100px){.sense-category-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:640px){.sense-category-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.sense-categories h2{font-size:30px}}
       .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit;direction:ltr}
       .dukkani-hero-track{display:flex;flex-direction:row-reverse;direction:ltr;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
       .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
@@ -718,6 +719,36 @@
     window.setInterval(next, 3000);
   }
 
+  function installSenseCategories() {
+    if (STORE !== "sense" || document.getElementById("dukkani-sense-categories")) return;
+    const existing = document.getElementById("categories");
+    if (existing) {
+      existing.id = "sense-original-categories-anchor";
+      existing.setAttribute("data-dukkani-old-anchor", "categories");
+    }
+    const section = document.createElement("section");
+    section.id = "categories";
+    section.className = "sense-categories";
+    section.innerHTML = `
+      <h2>الأقسام</h2>
+      <p>تصفحي أقسام سينس الرئيسية واختاري منتجاتك بسهولة</p>
+      <div id="dukkani-sense-categories" class="sense-category-grid">
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💄</span><span>المكياج</span></a>
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">✨</span><span>العناية</span></a>
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💇</span><span>الأجهزة</span></a>
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">🌸</span><span>العطور</span></a>
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">💅</span><span>الأظافر</span></a>
+        <a class="sense-category-card" href="/#products"><span class="sense-category-icon">%</span><span>العروض والخصومات</span></a>
+      </div>
+    `;
+    const productsSection = document.getElementById("products");
+    const footer = document.querySelector(".sense-footer");
+    const target = productsSection || footer;
+    if (target && target.parentNode) target.parentNode.insertBefore(section, target);
+    else document.body.appendChild(section);
+    if (location.hash === "#categories") requestAnimationFrame(() => section.scrollIntoView({ block: "start" }));
+  }
+
   function installSenseFooter() {
     if (STORE !== "sense" || document.querySelector(".sense-footer")) return;
     document.body.insertAdjacentHTML("beforeend", `
@@ -864,6 +895,7 @@
     installCustomerAccount();
     installUI();
     installHeroCarousel();
+    installSenseCategories();
     installSenseFooter();
     installSenseWhatsApp();
     if (new URLSearchParams(location.search).get("resume") === "checkout" && count()) {
