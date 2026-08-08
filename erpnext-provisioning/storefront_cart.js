@@ -113,16 +113,26 @@
       .dukkani-product-dots span.active{background:#fff}
       .dukkani-product-clickable{cursor:pointer}
       .dukkani-product-clickable:hover{transform:translateY(-2px);transition:transform .2s ease}
-      #dukkani-product-detail-page{background:#151817;color:#f5f0e8;direction:rtl;font-family:Cairo,Tajawal,Arial,sans-serif;min-height:100vh;padding:28px 5% 90px}
-      body.dukkani-detail-open>body{display:block}
+      #dukkani-product-detail-page{background:#f4f5f7;color:#1f2933;direction:rtl;font-family:Cairo,Tajawal,Arial,sans-serif;min-height:100vh;padding:0 0 80px}
       body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button){display:none!important}
-      .dukkani-detail-wrap{max-width:1220px;margin:0 auto}
-      .dukkani-detail-back{background:transparent;border:1px solid #343938;border-radius:999px;color:#d8d0c4;cursor:pointer;font:800 14px Tajawal,Arial,sans-serif;margin-bottom:26px;padding:10px 18px}
-      .dukkani-detail-grid{display:grid;grid-template-columns:minmax(320px,520px) 1fr;gap:48px;align-items:start}
-      .dukkani-detail-gallery{display:grid;gap:14px}.dukkani-detail-main-image{aspect-ratio:1/1;background:#101312;border:1px solid #303534;border-radius:22px;overflow:hidden}.dukkani-detail-main-image img{height:100%;object-fit:cover;width:100%}
-      .dukkani-detail-thumbs{display:flex;gap:10px;flex-wrap:wrap}.dukkani-detail-thumbs button{background:#101312;border:1px solid #303534;border-radius:12px;cursor:pointer;height:78px;overflow:hidden;padding:0;width:78px}.dukkani-detail-thumbs button.active{border-color:#b40e35}.dukkani-detail-thumbs img{height:100%;object-fit:cover;width:100%}
-      .dukkani-detail-info h1{font-size:38px;line-height:1.35;margin:0 0 14px}.dukkani-detail-code{color:#8f8b84;direction:ltr;font-size:14px;margin-bottom:14px;text-align:right}.dukkani-detail-price{color:#b40e35;font-size:30px;font-weight:900;margin:0 0 18px}.dukkani-detail-desc{color:#d8d0c4;font-size:17px;line-height:1.95;margin:0 0 24px}.dukkani-detail-stock{border-radius:999px;display:inline-block;font-weight:800;margin-bottom:22px;padding:8px 14px}.dukkani-detail-stock.in{background:#063d24;color:#7ee2a8}.dukkani-detail-stock.out{background:#4b0707;color:#fecaca}.dukkani-detail-add{background:#b40e35;border:0;border-radius:12px;color:#fff;cursor:pointer;font:900 17px Tajawal,Arial,sans-serif;padding:15px 28px;min-width:220px}.dukkani-detail-add:disabled{cursor:not-allowed;opacity:.55}.dukkani-detail-reviews{border-top:1px solid #303534;margin-top:34px;padding-top:24px}.dukkani-detail-reviews h2{font-size:22px;margin:0 0 14px}.dukkani-review{background:#101312;border:1px solid #303534;border-radius:14px;margin-bottom:10px;padding:14px}.dukkani-review-stars{color:#f59e0b;font-weight:900}
-      @media(max-width:850px){#dukkani-product-detail-page{padding:20px 18px 90px}.dukkani-detail-grid{grid-template-columns:1fr;gap:28px}.dukkani-detail-info h1{font-size:28px}}
+      .dukkani-detail-top{background:#fff;border-bottom:1px solid #e5e7eb;box-shadow:0 2px 12px #00000008}
+      .dukkani-detail-top-inner{align-items:center;display:flex;justify-content:space-between;gap:18px;margin:0 auto;max-width:1240px;padding:18px 24px}
+      .dukkani-detail-logo{align-items:center;display:flex;gap:10px;text-decoration:none;color:#1f2933;font-weight:900}.dukkani-detail-logo-mark{align-items:center;background:#f54873;border-radius:12px;color:#fff;display:inline-flex;font-size:26px;height:48px;justify-content:center;width:48px}.dukkani-detail-logo-text{color:#f54873;font-size:27px;font-weight:900;line-height:1}.dukkani-detail-logo-sub{color:#1f2933;font-size:13px;margin-top:2px}
+      .dukkani-detail-back{background:#111827;border:0;border-radius:4px;color:#fff;cursor:pointer;font:900 14px Tajawal,Arial,sans-serif;padding:12px 20px;text-transform:uppercase}
+      .dukkani-detail-wrap{max-width:1240px;margin:0 auto;padding:22px 24px 0}
+      .dukkani-detail-breadcrumb{color:#71717a;font-size:14px;margin:0 0 18px}.dukkani-detail-breadcrumb a{color:#71717a;text-decoration:none}.dukkani-detail-breadcrumb strong{color:#111827}
+      .dukkani-detail-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;box-shadow:0 10px 30px #0000000a;padding:22px}
+      .dukkani-detail-grid{display:grid;grid-template-columns:minmax(320px,520px) 1fr;gap:34px;align-items:start;direction:ltr}
+      .dukkani-detail-gallery{display:grid;gap:14px;direction:rtl}.dukkani-detail-main-image{align-items:center;aspect-ratio:1/1;background:#fff;border:1px solid #eeeeee;display:flex;justify-content:center;overflow:hidden;padding:18px}.dukkani-detail-main-image img{height:100%;object-fit:contain;width:100%}
+      .dukkani-detail-thumbs{display:flex;gap:10px;flex-wrap:wrap}.dukkani-detail-thumbs button{background:#fff;border:1px solid #e5e7eb;border-radius:4px;cursor:pointer;height:76px;overflow:hidden;padding:6px;width:76px}.dukkani-detail-thumbs button.active{border-color:#f54873;box-shadow:0 0 0 2px #f5487326}.dukkani-detail-thumbs img{height:100%;object-fit:contain;width:100%}
+      .dukkani-detail-info{direction:rtl;text-align:right}.dukkani-detail-info h1{color:#222;font-size:28px;font-weight:800;line-height:1.45;margin:0 0 12px}.dukkani-detail-rating{align-items:center;color:#f6b100;display:flex;gap:8px;font-size:15px;justify-content:flex-start;margin-bottom:14px}.dukkani-detail-rating span{color:#858585;font-size:13px}
+      .dukkani-detail-meta{border-bottom:1px solid #eeeeee;border-top:1px solid #eeeeee;color:#777;display:grid;gap:8px;font-size:14px;margin:0 0 18px;padding:14px 0}.dukkani-detail-meta b{color:#333}.dukkani-detail-code{direction:ltr;display:inline-block}
+      .dukkani-detail-price{color:#e62e4d;font-size:31px;font-weight:900;margin:0 0 18px}.dukkani-detail-stock{border-radius:3px;display:inline-block;font-weight:800;margin-bottom:18px;padding:7px 12px}.dukkani-detail-stock.in{background:#e7f8ef;color:#15945c}.dukkani-detail-stock.out{background:#fee2e2;color:#b91c1c}
+      .dukkani-detail-short{color:#555;font-size:16px;line-height:1.9;margin:0 0 18px}.dukkani-detail-actions{align-items:center;display:flex;flex-wrap:wrap;gap:12px;margin:18px 0}.dukkani-detail-qty{align-items:center;border:1px solid #e5e7eb;display:inline-flex;height:46px}.dukkani-detail-qty button{background:#f8f8f8;border:0;color:#555;cursor:pointer;font-size:20px;height:44px;width:42px}.dukkani-detail-qty strong{color:#111;display:inline-flex;justify-content:center;min-width:44px}
+      .dukkani-detail-add,.dukkani-detail-buy{border:0;border-radius:3px;color:#fff;cursor:pointer;font:900 15px Tajawal,Arial,sans-serif;min-width:160px;padding:14px 22px}.dukkani-detail-add{background:#f54873}.dukkani-detail-buy{background:#111827}.dukkani-detail-add:disabled,.dukkani-detail-buy:disabled{cursor:not-allowed;opacity:.55}.dukkani-detail-mini-actions{display:flex;gap:10px;margin-top:12px}.dukkani-detail-mini-actions button,.dukkani-detail-mini-actions a{align-items:center;background:#fff;border:1px solid #e5e7eb;border-radius:4px;color:#666;display:inline-flex;height:40px;justify-content:center;text-decoration:none;width:40px}
+      .dukkani-detail-tabs{background:#fff;border:1px solid #e5e7eb;border-radius:4px;margin-top:24px}.dukkani-detail-tabs h2{border-bottom:1px solid #eee;color:#222;font-size:20px;margin:0;padding:18px 22px}.dukkani-detail-desc{color:#555;font-size:16px;line-height:2;padding:20px 22px}.dukkani-detail-reviews{border-top:1px solid #eeeeee;margin:0;padding:20px 22px}.dukkani-detail-reviews h2{border:0;font-size:19px;margin:0 0 14px;padding:0}.dukkani-review{background:#fafafa;border:1px solid #eeeeee;border-radius:4px;margin-bottom:10px;padding:14px}.dukkani-review-stars{color:#f59e0b;font-weight:900}
+      .dukkani-related{margin-top:28px}.dukkani-related h2{color:#222;font-size:22px;margin:0 0 16px}.dukkani-related-grid{display:grid;gap:18px;grid-template-columns:repeat(4,minmax(0,1fr))}.dukkani-related-card{background:#fff;border:1px solid #e5e7eb;border-radius:4px;color:#222;cursor:pointer;padding:14px;text-align:center}.dukkani-related-card img{aspect-ratio:1/1;object-fit:contain;width:100%}.dukkani-related-card h3{font-size:14px;line-height:1.6;margin:10px 0 8px}.dukkani-related-card strong{color:#e62e4d}
+      @media(max-width:900px){.dukkani-detail-top-inner,.dukkani-detail-wrap{padding-left:16px;padding-right:16px}.dukkani-detail-grid{grid-template-columns:1fr;direction:rtl}.dukkani-detail-info h1{font-size:23px}.dukkani-detail-actions{align-items:stretch;flex-direction:column}.dukkani-detail-add,.dukkani-detail-buy{width:100%}.dukkani-related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
       .dukkani-hero-carousel{position:relative;display:block;overflow:hidden;border-radius:inherit;direction:ltr}
       .dukkani-hero-track{display:flex;flex-direction:row-reverse;direction:ltr;width:100%;height:100%;transition:transform .65s ease;will-change:transform}
       .dukkani-hero-track img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block}
@@ -333,6 +343,16 @@
     return products.find(row => String(row.code) === decoded);
   }
 
+  function productDescriptionHtml(product) {
+    const text = product.desc || product.description || "لا يوجد وصف تفصيلي لهذا المنتج.";
+    return escapeHtml(text).replace(/\n+/g, "<br>");
+  }
+
+  function relatedProducts(product) {
+    const currentCode = String(product.code || "");
+    return products.filter(row => String(row.code || "") !== currentCode).slice(0, 4);
+  }
+
   function renderProductReviews(product) {
     const reviews = Array.isArray(product.reviews) ? product.reviews : [];
     if (!reviews.length) {
@@ -397,6 +417,135 @@
     window.scrollTo({ top: 0, behavior: "instant" });
   }
 
+  function renderSenseReviews(product) {
+    const reviews = Array.isArray(product.reviews) ? product.reviews : [];
+    if (!reviews.length) return `<div class="dukkani-review">لا توجد تقييمات لهذا المنتج حتى الآن.</div>`;
+    return reviews.map(review => {
+      const rating = Math.max(1, Math.min(5, Number(review.rating) || 1));
+      return `<div class="dukkani-review">
+        <div class="dukkani-review-stars">${"★".repeat(rating)}${"☆".repeat(5 - rating)}</div>
+        <strong>${escapeHtml(review.name || "عميل")}</strong>
+        <p>${escapeHtml(review.comment || "")}</p>
+      </div>`;
+    }).join("");
+  }
+
+  function renderSenseProductDetail(product, replaceHistory) {
+    if (!product) return;
+    const existing = document.getElementById("dukkani-product-detail-page");
+    if (existing) existing.remove();
+    const images = normalizeImages(product);
+    const mainImage = images[0] || product.image || "https://placehold.co/900x900/f3f4f6/64748b?text=Product";
+    const outOfStock = Boolean(product.out_of_stock);
+    const related = relatedProducts(product);
+    const detail = document.createElement("main");
+    detail.id = "dukkani-product-detail-page";
+    detail.innerHTML = `
+      <div class="dukkani-detail-top">
+        <div class="dukkani-detail-top-inner">
+          <a class="dukkani-detail-logo" href="/">
+            <span class="dukkani-detail-logo-mark">S</span>
+            <span>
+              <span class="dukkani-detail-logo-text">SenSe</span>
+              <span class="dukkani-detail-logo-sub">كوني الأجمل</span>
+            </span>
+          </a>
+          <button type="button" class="dukkani-detail-back">العودة للمتجر</button>
+        </div>
+      </div>
+      <div class="dukkani-detail-wrap">
+        <div class="dukkani-detail-breadcrumb">
+          <a href="/">الرئيسية</a> / <a href="/#products">المنتجات</a> / <strong>${escapeHtml(product.name || "")}</strong>
+        </div>
+        <div class="dukkani-detail-card">
+          <div class="dukkani-detail-grid">
+            <div class="dukkani-detail-gallery">
+              <div class="dukkani-detail-main-image"><img src="${escapeHtml(mainImage)}" alt="${escapeHtml(product.name || "")}"></div>
+              <div class="dukkani-detail-thumbs">
+                ${(images.length ? images : [mainImage]).map((src, index) => `<button type="button" class="${index === 0 ? "active" : ""}" data-src="${escapeHtml(src)}"><img src="${escapeHtml(src)}" alt="${escapeHtml(product.name || "")}"></button>`).join("")}
+              </div>
+            </div>
+            <div class="dukkani-detail-info">
+              <h1>${escapeHtml(product.name || "")}</h1>
+              <div class="dukkani-detail-rating">★★★★★ <span>لا توجد مراجعات بعد</span></div>
+              <div class="dukkani-detail-meta">
+                <div>الحالة: <b>${outOfStock ? "غير متوفر" : "متوفر"}</b></div>
+                <div>كود المنتج: <b class="dukkani-detail-code">${escapeHtml(product.code || "")}</b></div>
+              </div>
+              <div class="dukkani-detail-price">${money(product.rate)} ${escapeHtml(storeCurrency)}</div>
+              <div class="dukkani-detail-stock ${outOfStock ? "out" : "in"}">${outOfStock ? "غير متوفر" : "متوفر"}</div>
+              <p class="dukkani-detail-short">${productDescriptionHtml(product)}</p>
+              <div class="dukkani-detail-actions">
+                <div class="dukkani-detail-qty" aria-label="الكمية">
+                  <button type="button" class="dukkani-detail-minus">−</button>
+                  <strong class="dukkani-detail-qty-value">1</strong>
+                  <button type="button" class="dukkani-detail-plus">+</button>
+                </div>
+                <button type="button" class="dukkani-detail-add" ${outOfStock ? "disabled" : ""}>إضافة إلى السلة</button>
+                <button type="button" class="dukkani-detail-buy" ${outOfStock ? "disabled" : ""}>اشتر الآن</button>
+              </div>
+              <div class="dukkani-detail-mini-actions">
+                <button type="button" title="المفضلة">♡</button>
+                <button type="button" title="مشاركة">↗</button>
+                <a href="https://wa.me/?text=${encodeURIComponent((product.name || "") + " " + location.origin + productDetailUrl(product.code))}" target="_blank" rel="noopener" title="واتساب">☏</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <section class="dukkani-detail-tabs">
+          <h2>الوصف</h2>
+          <div class="dukkani-detail-desc">${productDescriptionHtml(product)}</div>
+          <div class="dukkani-detail-reviews">
+            <h2>تقييمات المنتج</h2>
+            ${renderSenseReviews(product)}
+          </div>
+        </section>
+        ${related.length ? `<section class="dukkani-related">
+          <h2>منتجات مشابهة</h2>
+          <div class="dukkani-related-grid">
+            ${related.map(row => {
+              const image = normalizeImages(row)[0] || row.image || "https://placehold.co/600x600/f3f4f6/64748b?text=Product";
+              return `<article class="dukkani-related-card" data-code="${escapeHtml(row.code || "")}">
+                <img src="${escapeHtml(image)}" alt="${escapeHtml(row.name || "")}">
+                <h3>${escapeHtml(row.name || "")}</h3>
+                <strong>${money(row.rate)} ${escapeHtml(storeCurrency)}</strong>
+              </article>`;
+            }).join("")}
+          </div>
+        </section>` : ""}
+      </div>`;
+    document.body.appendChild(detail);
+    document.body.classList.add("dukkani-detail-open");
+    const main = detail.querySelector(".dukkani-detail-main-image img");
+    detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(button => {
+      button.addEventListener("click", () => {
+        detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(row => row.classList.remove("active"));
+        button.classList.add("active");
+        main.src = button.dataset.src || main.src;
+      });
+    });
+    let qty = 1;
+    const qtyValue = detail.querySelector(".dukkani-detail-qty-value");
+    const setQty = value => {
+      qty = Math.max(1, Math.min(99, Number(value) || 1));
+      qtyValue.textContent = qty;
+    };
+    detail.querySelector(".dukkani-detail-minus").addEventListener("click", () => setQty(qty - 1));
+    detail.querySelector(".dukkani-detail-plus").addEventListener("click", () => setQty(qty + 1));
+    const addQty = () => {
+      for (let index = 0; index < qty; index += 1) add(product.code);
+    };
+    detail.querySelector(".dukkani-detail-add").addEventListener("click", addQty);
+    detail.querySelector(".dukkani-detail-buy").addEventListener("click", () => {
+      addQty();
+      openCart();
+    });
+    detail.querySelectorAll(".dukkani-detail-back").forEach(button => button.addEventListener("click", () => closeProductDetail(true)));
+    detail.querySelectorAll(".dukkani-related-card").forEach(card => card.addEventListener("click", () => openProductDetail(card.dataset.code)));
+    if (replaceHistory) history.pushState({ product: product.code }, "", productDetailUrl(product.code));
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }
+
   function closeProductDetail(updateHistory) {
     const detail = document.getElementById("dukkani-product-detail-page");
     if (detail) detail.remove();
@@ -411,7 +560,7 @@
   function openProductDetail(code, replaceHistory = true) {
     const product = findProduct(code);
     if (!product) return;
-    renderProductDetail(product, replaceHistory);
+    renderSenseProductDetail(product, replaceHistory);
   }
 
   function openInitialProductDetail() {
