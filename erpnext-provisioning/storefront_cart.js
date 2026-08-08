@@ -114,7 +114,7 @@
       .dukkani-product-clickable{cursor:pointer}
       .dukkani-product-clickable:hover{transform:translateY(-2px);transition:transform .2s ease}
       #dukkani-product-detail-page{background:#f4f5f7;color:#1f2933;direction:rtl;font-family:Cairo,Tajawal,Arial,sans-serif;min-height:100vh;padding:0 0 80px}
-      body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button):not(.sense-footer):not(.sense-whatsapp){display:none!important}
+      body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button):not(.sense-whatsapp){display:none!important}
       .dukkani-detail-top{background:#fff;border-bottom:1px solid #e5e7eb;box-shadow:0 2px 12px #00000008}
       .dukkani-detail-top-inner{align-items:center;display:grid;grid-template-columns:auto minmax(260px,1fr) auto;gap:22px;margin:0 auto;max-width:1240px;padding:18px 24px}
       .dukkani-detail-logo{align-items:center;display:flex;gap:10px;text-decoration:none;color:#1f2933;font-weight:900}.dukkani-detail-logo-mark{align-items:center;background:#f54873;border-radius:12px;color:#fff;display:inline-flex;font-size:26px;height:48px;justify-content:center;width:48px}.dukkani-detail-logo-text{color:#f54873;font-size:27px;font-weight:900;line-height:1}.dukkani-detail-logo-sub{color:#1f2933;font-size:13px;margin-top:2px}
@@ -150,7 +150,7 @@
       .sense-footer-col{text-align:center}.sense-footer-col h3{color:#f4eee6;font-size:16px;font-weight:900;margin:0 0 22px;text-transform:uppercase}.sense-footer-col h3:after{background:#c10f39;content:"";display:block;height:3px;margin:12px auto 0;width:76px}
       .sense-footer-col a,.sense-footer-col p{color:#8f8b84;display:block;font-size:16px;line-height:1.9;margin:0 0 8px;text-decoration:none}.sense-footer-col b{color:#aaa39a;display:block;font-weight:700;margin-top:8px}
       .sense-footer-app-icon{align-items:center;background:linear-gradient(135deg,#31489c,#25b69b);border:7px solid #f1f1f1;border-radius:999px;color:#fff;display:inline-flex;font-size:42px;font-weight:900;height:116px;justify-content:center;margin-top:6px;width:116px}
-      .sense-footer-bottom{background:#1c201f;margin:48px -6% 0;padding:18px 6%}.sense-footer-bottom-inner{align-items:center;display:flex;gap:24px;justify-content:space-between;max-width:1360px;margin:0 auto}.sense-footer-payments,.sense-footer-social{align-items:center;display:flex;gap:14px}.sense-footer-payment{background:#232826;border-radius:8px;color:#ddd;font-size:13px;font-weight:800;padding:8px 12px}.sense-footer-social a{align-items:center;border-radius:999px;color:#fff;display:inline-flex;font-weight:900;height:42px;justify-content:center;text-decoration:none;width:42px}.sense-footer-social a:nth-child(1){background:#c13584}.sense-footer-social a:nth-child(2){background:#1da1f2}.sense-footer-social a:nth-child(3){background:#31569c}.sense-footer-copy{color:#8f8b84;font-size:14px;text-align:center}
+      .sense-footer-bottom{background:#1c201f;margin:48px -6% 0;padding:18px 6%}.sense-footer-bottom-inner{align-items:center;display:flex;gap:24px;justify-content:space-between;max-width:1360px;margin:0 auto}.sense-footer-payments,.sense-footer-social{align-items:center;display:flex;gap:14px}.sense-footer-payment{background:#232826;border-radius:8px;color:#ddd;font-size:13px;font-weight:800;padding:8px 12px}.sense-footer-social a{align-items:center;border-radius:999px;color:#fff;display:inline-flex;font-weight:900;height:42px;justify-content:center;text-decoration:none;width:42px}.sense-footer-social a:nth-child(1){background:#c13584}.sense-footer-social a:nth-child(2){background:#1da1f2}.sense-footer-social a:nth-child(3){background:#31569c}.sense-footer-copy{color:#8f8b84;font-size:14px;text-align:center}.sense-footer-detail{margin-top:48px}
       .sense-whatsapp{align-items:center;background:#0b8f45;border-radius:999px;bottom:150px;box-shadow:0 10px 28px #0004;color:#fff;display:flex;height:64px;justify-content:center;left:24px;position:fixed;text-decoration:none;width:64px;z-index:9998}
       .sense-whatsapp svg{display:block;height:34px;width:34px;fill:currentColor}
       @media(max-width:900px){.sense-footer-grid{grid-template-columns:1fr;text-align:center}.sense-footer-brand{text-align:center}.sense-footer-newsletter{margin:0 auto}.sense-footer-seller{justify-content:center}.sense-footer-bottom-inner{flex-direction:column}.sense-whatsapp{bottom:136px;height:56px;width:56px}.sense-whatsapp svg{height:30px;width:30px}}
@@ -443,6 +443,9 @@
     const mainImage = images[0] || product.image || "https://placehold.co/900x900/f3f4f6/64748b?text=Product";
     const outOfStock = Boolean(product.out_of_stock);
     const related = relatedProducts(product);
+    const pageFooter = STORE === "sense"
+      ? (document.querySelector(".sense-footer")?.outerHTML || "").replace('class="sense-footer"', 'class="sense-footer sense-footer-detail"')
+      : "";
     const detail = document.createElement("main");
     detail.id = "dukkani-product-detail-page";
     detail.innerHTML = `
@@ -535,9 +538,12 @@
             }).join("")}
           </div>
         </section>` : ""}
-      </div>`;
+      </div>
+      ${pageFooter}`;
     document.body.appendChild(detail);
     document.body.classList.add("dukkani-detail-open");
+    window.scrollTo(0, 0);
+    requestAnimationFrame(() => window.scrollTo(0, 0));
     const main = detail.querySelector(".dukkani-detail-main-image img");
     detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(button => {
       button.addEventListener("click", () => {
@@ -712,7 +718,6 @@
   function installSenseFooter() {
     if (STORE !== "sense" || document.querySelector(".sense-footer")) return;
     document.body.insertAdjacentHTML("beforeend", `
-      <a class="sense-whatsapp" href="https://wa.me/966555601936" target="_blank" rel="noopener" aria-label="WhatsApp">☏</a>
       <footer class="sense-footer">
         <div class="sense-footer-grid">
           <div class="sense-footer-brand">
