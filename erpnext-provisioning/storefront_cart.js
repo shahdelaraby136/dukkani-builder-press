@@ -114,7 +114,7 @@
       .dukkani-product-clickable{cursor:pointer}
       .dukkani-product-clickable:hover{transform:translateY(-2px);transition:transform .2s ease}
       #dukkani-product-detail-page{background:#f4f5f7;color:#1f2933;direction:rtl;font-family:Cairo,Tajawal,Arial,sans-serif;min-height:100vh;padding:0 0 80px}
-      body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button){display:none!important}
+      body.dukkani-detail-open>*:not(#dukkani-product-detail-page):not(#dukkani-cart-overlay):not(#dukkani-cart-button):not(#dukkani-header-cart-button):not(.sense-footer):not(.sense-whatsapp){display:none!important}
       .dukkani-detail-top{background:#fff;border-bottom:1px solid #e5e7eb;box-shadow:0 2px 12px #00000008}
       .dukkani-detail-top-inner{align-items:center;display:grid;grid-template-columns:auto minmax(260px,1fr) auto;gap:22px;margin:0 auto;max-width:1240px;padding:18px 24px}
       .dukkani-detail-logo{align-items:center;display:flex;gap:10px;text-decoration:none;color:#1f2933;font-weight:900}.dukkani-detail-logo-mark{align-items:center;background:#f54873;border-radius:12px;color:#fff;display:inline-flex;font-size:26px;height:48px;justify-content:center;width:48px}.dukkani-detail-logo-text{color:#f54873;font-size:27px;font-weight:900;line-height:1}.dukkani-detail-logo-sub{color:#1f2933;font-size:13px;margin-top:2px}
@@ -404,7 +404,9 @@
           </div>
         </div>
       </div>`;
-    document.body.appendChild(detail);
+    const footer = document.querySelector(".sense-footer");
+    if (footer) document.body.insertBefore(detail, footer);
+    else document.body.appendChild(detail);
     document.body.classList.add("dukkani-detail-open");
     const main = detail.querySelector(".dukkani-detail-main-image img");
     detail.querySelectorAll(".dukkani-detail-thumbs button").forEach(button => {
@@ -854,6 +856,7 @@
     installCustomerAccount();
     installUI();
     installHeroCarousel();
+    installSenseFooter();
     installSenseWhatsApp();
     if (new URLSearchParams(location.search).get("resume") === "checkout" && count()) {
       document.getElementById("dukkani-cart-overlay").classList.add("open");
