@@ -343,10 +343,11 @@
 
   function senseProductCategory(product) {
     const text = `${product?.name || ""} ${product?.code || ""} ${product?.desc || ""}`.toLowerCase();
-    if (/e\.l\.f|هايلايتر|مكياج|makeup/.test(text)) return "makeup";
-    if (/سيروم|كريستال|عناية|care|زيت الأرجان|زيت الزيتون/.test(text)) return "care";
-    if (/عطر|عطور|perfume|fragrance/.test(text)) return "perfume";
-    if (/أظافر|اظافر|nail/.test(text)) return "nails";
+    const code = String(product?.code || "").toUpperCase();
+    if (code.includes("ELF") || /makeup|highlighter/.test(text)) return "makeup";
+    if (code === "SENSE-009" || code === "SENSE-010" || /care|serum|crystal/.test(text)) return "care";
+    if (/perfume|fragrance/.test(text)) return "perfume";
+    if (/nail/.test(text)) return "nails";
     return "devices";
   }
 
@@ -378,10 +379,18 @@
         filterSenseProducts(category);
       });
     });
-    const imageCategories = ["makeup", "care", "devices", "perfume", "nails", "all"];
+    const imageCategory = image => {
+      const source = String(image?.currentSrc || image?.src || "").toLowerCase();
+      if (source.includes("category-makeup") || source.includes("promo-makeup")) return "makeup";
+      if (source.includes("category-care") || source.includes("promo-care")) return "care";
+      if (source.includes("category-devices") || source.includes("promo-devices")) return "devices";
+      if (source.includes("category-perfume") || source.includes("promo-perfume")) return "perfume";
+      if (source.includes("category-nails")) return "nails";
+      return null;
+    };
     root.querySelectorAll("img").forEach((image, index) => {
       if (image.dataset.senseCategoryBound === "1") return;
-      const category = imageCategories[index] || "all";
+      const category = imageCategory(image) || ["makeup", "care", "devices", "perfume", "nails", "all"][index] || "all";
       image.dataset.senseCategoryBound = "1";
       let card = image.closest("a,button,[role='button']") || image.parentElement;
       if (card && card !== root) {
@@ -393,6 +402,26 @@
         });
       }
     });
+  }
+
+  function installSenseCategoryDelegation() {
+    if (STORE !== "sense" || document.documentElement.dataset.senseCategoryDelegation === "1") return;
+    document.documentElement.dataset.senseCategoryDelegation = "1";
+    document.addEventListener("click", event => {
+      const image = event.target.closest("img");
+      const source = String(image?.currentSrc || image?.src || "").toLowerCase();
+      if (!image || !source.includes("sense-brand-")) return;
+      const category = source.includes("makeup") ? "makeup"
+        : source.includes("care") ? "care"
+        : source.includes("devices") ? "devices"
+        : source.includes("perfume") ? "perfume"
+        : source.includes("nails") ? "nails" : null;
+      if (!category) return;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      filterSenseProducts(category);
+      history.replaceState(null, "", "#products");
+    }, true);
   }
 
   function setProductButtonsLoading(loading) {
@@ -834,10 +863,13 @@
   }
 
   function installSenseCategories() {
-    if (STORE !== "sense" || document.getElementById("dukkani-sense-categories")) return;
+    if (STORE !== "sense") return;
+    installSenseCategoryDelegation();
+    if (document.getElementById("dukkani-sense-categories")) return;
     const existing = document.getElementById("categories");
     if (existing) {
       bindSenseCategoryCards(existing);
+      document.querySelectorAll("img[src*='sense-brand-promo-']").forEach(image => bindSenseCategoryCards(image.closest("a") || image.parentElement));
       if (location.hash === "#categories") requestAnimationFrame(() => existing.scrollIntoView({ block: "start" }));
       return;
     }
