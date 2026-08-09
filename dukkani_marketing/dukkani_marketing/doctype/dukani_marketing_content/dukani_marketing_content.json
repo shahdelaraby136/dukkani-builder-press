@@ -1,0 +1,22 @@
+{
+  "doctype": "DocType",
+  "name": "Dukani Marketing Content",
+  "module": "Dukani Marketing",
+  "custom": 0,
+  "is_submittable": 0,
+  "allow_rename": 0,
+  "fields": [
+    {"fieldname": "title", "fieldtype": "Data", "label": "Title", "reqd": 1, "length": 160},
+    {"fieldname": "body", "fieldtype": "Long Text", "label": "Body", "reqd": 1},
+    {"fieldname": "channel", "fieldtype": "Select", "label": "Channel", "options": "internal\\nfacebook\\ninstagram\\nwhatsapp", "default": "internal", "reqd": 1},
+    {"fieldname": "status", "fieldtype": "Select", "label": "Status", "options": "Draft\\nPending Approval\\nApproved\\nPublished\\nRejected", "default": "Draft", "read_only": 1},
+    {"fieldname": "tenant_site", "fieldtype": "Data", "label": "Tenant Site", "reqd": 1, "read_only": 1, "index": 1},
+    {"fieldname": "created_by_user", "fieldtype": "Link", "options": "User", "label": "Created By User", "read_only": 1}
+  ],
+  "permissions": [
+    {"role": "Dukani Marketing User", "read": 1, "write": 1, "create": 1, "delete": 0},
+    {"role": "System Manager", "read": 1, "write": 1, "create": 1, "delete": 1}
+  ],
+  "sort_field": "creation",
+  "sort_order": "DESC"
+}

@@ -1,0 +1,10 @@
+[project]
+name = "dukkani_marketing"
+version = "0.1.0"
+description = "Dukani marketing and customer-service workflows for Frappe"
+requires-python = ">=3.10"
+license = {text = "AGPL-3.0-or-later"}
+
+[build-system]
+requires = ["flit_core>=3.4,<4"]
+build-backend = "flit_core.buildapi"
